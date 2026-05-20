@@ -138,6 +138,9 @@
     "title": "פרסום",
     "fieldCopied": "השדה הועתק",
     "skipEmpty": "דלג - שדה ריק",
+    "imageDownloaded": "התמונה נשמרה",
+    "downloadImage": "הורדת תמונה",
+    "skipNoImage": "דלג - ללא תמונה",
     "allFieldsDone": "כל השדות הושלמו",
     "markDone": "סיום - סמן כפורסם",
     "progress": "התקדמות"

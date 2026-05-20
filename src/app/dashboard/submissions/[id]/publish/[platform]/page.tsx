@@ -13,11 +13,14 @@ import type {
   PlatformContent,
 } from "@/lib/types";
 import PublishField from "@/components/dashboard/PublishField";
+import PublishImageField from "@/components/dashboard/PublishImageField";
 
 interface FieldDef {
   key: string;
   label: string;
   value: string;
+  type?: "text" | "image";
+  imageUrl?: string;
 }
 
 export default function PublishingChecklistPage() {
@@ -28,12 +31,13 @@ export default function PublishingChecklistPage() {
   const platform = params.platform as Platform;
 
   const [content, setContent] = useState<PlatformContent | null>(null);
+  const [imageUrls, setImageUrls] = useState<Record<string, string>>({});
   const [checkedFields, setCheckedFields] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
   const [completing, setCompleting] = useState(false);
 
   const fetchData = useCallback(async () => {
-    const [contentRes, progressRes] = await Promise.all([
+    const [contentRes, progressRes, imagesRes] = await Promise.all([
       supabase
         .from("submission_content")
         .select("content")
@@ -46,6 +50,11 @@ export default function PublishingChecklistPage() {
         .eq("submission_id", submissionId)
         .eq("platform", platform)
         .single(),
+      supabase
+        .from("images")
+        .select("field_name, storage_path")
+        .eq("submission_id", submissionId)
+        .eq("platform", platform),
     ]);
 
     if (contentRes.data) {
@@ -58,6 +67,19 @@ export default function PublishingChecklistPage() {
       }
       setCheckedFields(checked);
     }
+
+    // Build image URLs from storage
+    if (imagesRes.data) {
+      const urls: Record<string, string> = {};
+      for (const img of imagesRes.data) {
+        const { data } = supabase.storage
+          .from("ad-images")
+          .getPublicUrl(img.storage_path);
+        urls[img.field_name] = data.publicUrl;
+      }
+      setImageUrls(urls);
+    }
+
     setLoading(false);
   }, [submissionId, platform]);
 
@@ -125,7 +147,9 @@ export default function PublishingChecklistPage() {
         const f = content as FacebookAdContent;
         return [
           { key: "pageName", label: t.facebook.pageName, value: f.pageName },
+          { key: "profileImage", label: t.facebook.profileImage, value: f.profileImage || "", type: "image", imageUrl: imageUrls.profileImage },
           { key: "primaryText", label: t.facebook.primaryText, value: f.primaryText },
+          { key: "adImage", label: t.facebook.adImage, value: f.adImage || "", type: "image", imageUrl: imageUrls.adImage },
           { key: "headline", label: t.facebook.headline, value: f.headline },
           { key: "description", label: t.facebook.description, value: f.description },
           { key: "ctaButton", label: t.facebook.ctaButton, value: f.ctaButton },
@@ -135,7 +159,9 @@ export default function PublishingChecklistPage() {
         const l = content as LinkedInAdContent;
         return [
           { key: "companyName", label: t.linkedin.companyName, value: l.companyName },
+          { key: "companyLogo", label: t.linkedin.companyLogo, value: l.companyLogo || "", type: "image", imageUrl: imageUrls.companyLogo },
           { key: "introText", label: t.linkedin.introText, value: l.introText },
+          { key: "adImage", label: t.linkedin.adImage, value: l.adImage || "", type: "image", imageUrl: imageUrls.adImage },
           { key: "headline", label: t.linkedin.headline, value: l.headline },
           { key: "description", label: t.linkedin.description, value: l.description },
           { key: "ctaButton", label: t.linkedin.ctaButton, value: l.ctaButton },
@@ -146,6 +172,7 @@ export default function PublishingChecklistPage() {
         return [
           { key: "pinTitle", label: t.pinterest.pinTitle, value: p.pinTitle },
           { key: "pinDescription", label: t.pinterest.pinDescription, value: p.pinDescription },
+          { key: "pinImage", label: t.pinterest.pinImage, value: p.pinImage || "", type: "image", imageUrl: imageUrls.pinImage },
           { key: "destinationUrl", label: t.pinterest.destinationUrl, value: p.destinationUrl },
           { key: "boardName", label: t.pinterest.boardName, value: p.boardName },
         ];
@@ -162,14 +189,14 @@ export default function PublishingChecklistPage() {
   }
 
   const fields = getFields();
-  const nonEmptyFields = fields.filter((f) => f.value);
+  const nonEmptyFields = fields.filter((f) => f.value || f.imageUrl);
   const checkedCount = Object.values(checkedFields).filter(Boolean).length;
   const totalCount = nonEmptyFields.length;
   const allDone = totalCount > 0 && checkedCount >= totalCount;
   const progressPct = totalCount > 0 ? (checkedCount / totalCount) * 100 : 0;
 
   return (
-    <div className="mx-auto max-w-2xl">
+    <div className="mx-auto max-w-2xl pb-8">
       {/* Header */}
       <div className="mb-6">
         <a
@@ -189,36 +216,49 @@ export default function PublishingChecklistPage() {
         </p>
       </div>
 
-      {/* Progress bar */}
-      <div className="mb-6 rounded-xl border border-border bg-bg-white p-4">
-        <div className="mb-2 flex items-center justify-between text-sm">
-          <span className="font-medium text-text-secondary">
-            {t.publishing.progress}
-          </span>
-          <span className="font-bold text-primary">
-            {checkedCount}/{totalCount}
-          </span>
-        </div>
-        <div className="h-2 overflow-hidden rounded-full bg-bg-light">
-          <div
-            className="h-full rounded-full bg-teal transition-all duration-500"
-            style={{ width: `${progressPct}%` }}
-          />
+      {/* Sticky progress bar */}
+      <div className="sticky top-0 z-10 -mx-4 mb-6 border-b border-border bg-bg-light/95 px-4 py-3 backdrop-blur-sm">
+        <div className="mx-auto max-w-2xl rounded-xl border border-border bg-bg-white p-4 shadow-sm">
+          <div className="mb-2 flex items-center justify-between text-sm">
+            <span className="font-medium text-text-secondary">
+              {t.publishing.progress}
+            </span>
+            <span className="font-bold text-primary">
+              {checkedCount}/{totalCount}
+            </span>
+          </div>
+          <div className="h-2.5 overflow-hidden rounded-full bg-bg-light">
+            <div
+              className="h-full rounded-full bg-teal transition-all duration-500"
+              style={{ width: `${progressPct}%` }}
+            />
+          </div>
         </div>
       </div>
 
       {/* Fields */}
       <div className="flex flex-col gap-3">
-        {fields.map((field) => (
-          <PublishField
-            key={field.key}
-            label={field.label}
-            value={field.value}
-            checked={!!checkedFields[field.key]}
-            onCheck={(checked) => handleCheck(field.key, checked)}
-            isEmpty={!field.value}
-          />
-        ))}
+        {fields.map((field) =>
+          field.type === "image" ? (
+            <PublishImageField
+              key={field.key}
+              label={field.label}
+              imageUrl={field.imageUrl || null}
+              checked={!!checkedFields[field.key]}
+              onCheck={(checked) => handleCheck(field.key, checked)}
+              isEmpty={!field.imageUrl}
+            />
+          ) : (
+            <PublishField
+              key={field.key}
+              label={field.label}
+              value={field.value}
+              checked={!!checkedFields[field.key]}
+              onCheck={(checked) => handleCheck(field.key, checked)}
+              isEmpty={!field.value}
+            />
+          )
+        )}
       </div>
 
       {/* Complete button */}

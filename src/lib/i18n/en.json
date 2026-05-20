@@ -138,6 +138,9 @@
     "title": "Publishing",
     "fieldCopied": "Field copied",
     "skipEmpty": "Skip - empty field",
+    "imageDownloaded": "Image saved",
+    "downloadImage": "Download Image",
+    "skipNoImage": "Skip - no image",
     "allFieldsDone": "All fields completed",
     "markDone": "Done - Mark as Published",
     "progress": "Progress"
