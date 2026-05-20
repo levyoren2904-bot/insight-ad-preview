@@ -8,6 +8,7 @@ import {
   CtaOption,
   AdFormat,
 } from "@/lib/types";
+import { fieldTips } from "@/lib/field-tips";
 import TextField from "./shared/TextField";
 import ImageUpload from "./shared/ImageUpload";
 import SelectField from "./shared/SelectField";
@@ -24,8 +25,10 @@ export default function LinkedInAdForm({
   onChange,
   onImageFile,
 }: LinkedInAdFormProps) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const limits = CHAR_LIMITS.linkedin;
+  const tips = fieldTips.linkedin;
+  const tip = (field: string) => tips[field]?.[locale];
 
   const update = (field: keyof LinkedInAdContent, value: string) => {
     onChange({ ...data, [field]: value });
@@ -56,6 +59,7 @@ export default function LinkedInAdForm({
         value={data.companyName}
         onChange={(v) => update("companyName", v)}
         required
+        tip={tip("companyName")}
       />
       <ImageUpload
         label={t.linkedin.companyLogo}
@@ -72,6 +76,7 @@ export default function LinkedInAdForm({
         maxChars={limits.introText}
         multiline
         required
+        tip={tip("introText")}
       />
       <ImageUpload
         label={t.linkedin.adImage}
@@ -87,6 +92,7 @@ export default function LinkedInAdForm({
         onChange={(v) => update("headline", v)}
         maxChars={limits.headline}
         required
+        tip={tip("headline")}
       />
       <TextField
         label={t.linkedin.description}
@@ -94,6 +100,7 @@ export default function LinkedInAdForm({
         onChange={(v) => update("description", v)}
         maxChars={limits.description}
         optional
+        tip={tip("description")}
       />
       <SelectField
         label={t.linkedin.ctaButton}

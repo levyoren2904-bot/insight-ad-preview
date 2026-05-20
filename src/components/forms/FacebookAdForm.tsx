@@ -8,6 +8,7 @@ import {
   CtaOption,
   AdFormat,
 } from "@/lib/types";
+import { fieldTips } from "@/lib/field-tips";
 import TextField from "./shared/TextField";
 import ImageUpload from "./shared/ImageUpload";
 import SelectField from "./shared/SelectField";
@@ -24,8 +25,10 @@ export default function FacebookAdForm({
   onChange,
   onImageFile,
 }: FacebookAdFormProps) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const limits = CHAR_LIMITS.facebook;
+  const tips = fieldTips.facebook;
+  const tip = (field: string) => tips[field]?.[locale];
 
   const update = (field: keyof FacebookAdContent, value: string) => {
     onChange({ ...data, [field]: value });
@@ -55,6 +58,7 @@ export default function FacebookAdForm({
         value={data.pageName}
         onChange={(v) => update("pageName", v)}
         required
+        tip={tip("pageName")}
       />
       <ImageUpload
         label={t.facebook.profileImage}
@@ -71,6 +75,7 @@ export default function FacebookAdForm({
         maxChars={limits.primaryText}
         multiline
         required
+        tip={tip("primaryText")}
       />
       <ImageUpload
         label={t.facebook.adImage}
@@ -86,6 +91,7 @@ export default function FacebookAdForm({
         onChange={(v) => update("headline", v)}
         maxChars={limits.headline}
         required
+        tip={tip("headline")}
       />
       <TextField
         label={t.facebook.description}
@@ -93,6 +99,7 @@ export default function FacebookAdForm({
         onChange={(v) => update("description", v)}
         maxChars={limits.description}
         optional
+        tip={tip("description")}
       />
       <SelectField
         label={t.facebook.ctaButton}

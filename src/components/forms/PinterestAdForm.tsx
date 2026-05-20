@@ -2,6 +2,7 @@
 
 import { useI18n } from "@/lib/i18n";
 import { PinterestAdContent, CHAR_LIMITS } from "@/lib/types";
+import { fieldTips } from "@/lib/field-tips";
 import TextField from "./shared/TextField";
 import ImageUpload from "./shared/ImageUpload";
 
@@ -16,8 +17,10 @@ export default function PinterestAdForm({
   onChange,
   onImageFile,
 }: PinterestAdFormProps) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const limits = CHAR_LIMITS.pinterest;
+  const tips = fieldTips.pinterest;
+  const tip = (field: string) => tips[field]?.[locale];
 
   const update = (field: keyof PinterestAdContent, value: string) => {
     onChange({ ...data, [field]: value });
@@ -31,6 +34,7 @@ export default function PinterestAdForm({
         onChange={(v) => update("pinTitle", v)}
         maxChars={limits.pinTitle}
         required
+        tip={tip("pinTitle")}
       />
       <TextField
         label={t.pinterest.pinDescription}
@@ -40,6 +44,7 @@ export default function PinterestAdForm({
         multiline
         rows={4}
         required
+        tip={tip("pinDescription")}
       />
       <TextField
         label={t.pinterest.destinationUrl}
@@ -47,6 +52,7 @@ export default function PinterestAdForm({
         onChange={(v) => update("destinationUrl", v)}
         placeholder="https://..."
         required
+        tip={tip("destinationUrl")}
       />
       <ImageUpload
         label={t.pinterest.pinImage}
@@ -61,6 +67,7 @@ export default function PinterestAdForm({
         value={data.boardName}
         onChange={(v) => update("boardName", v)}
         optional
+        tip={tip("boardName")}
       />
     </div>
   );
