@@ -136,7 +136,14 @@
     "statusSaved": "Status saved successfully",
     "clientSaved": "Client saved successfully",
     "clientPlatforms": "Advertising Platforms",
-    "clientName": "Client Name"
+    "clientName": "Client Name",
+    "clientDetails": "Client Details",
+    "linkGenerated": "Link generated successfully",
+    "activeLinks": "Active Links",
+    "noLinks": "No links generated yet",
+    "submissionsCount": "Submissions",
+    "linksCount": "Links",
+    "noPlatforms": "No platforms"
   },
   "publishing": {
     "title": "Publishing",

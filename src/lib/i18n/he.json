@@ -136,7 +136,14 @@
     "statusSaved": "הסטטוס נשמר בהצלחה",
     "clientSaved": "הלקוח נשמר בהצלחה",
     "clientPlatforms": "פלטפורמות פרסום",
-    "clientName": "שם הלקוח"
+    "clientName": "שם הלקוח",
+    "clientDetails": "פרטי לקוח",
+    "linkGenerated": "הקישור נוצר בהצלחה",
+    "activeLinks": "קישורים פעילים",
+    "noLinks": "אין קישורים עדיין",
+    "submissionsCount": "הגשות",
+    "linksCount": "קישורים",
+    "noPlatforms": "ללא פלטפורמות"
   },
   "publishing": {
     "title": "פרסום",

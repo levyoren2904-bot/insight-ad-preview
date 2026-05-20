@@ -2,28 +2,13 @@
 
 import { useI18n } from "@/lib/i18n";
 import { Platform, PLATFORM_LIST } from "@/lib/types";
+import PlatformLogo from "@/components/ui/PlatformLogo";
 
 interface PlatformTabsProps {
   activePlatform: Platform;
   onSelect: (platform: Platform) => void;
   allowedPlatforms: Platform[];
 }
-
-const PLATFORM_ICONS: Record<Platform, string> = {
-  google: "G",
-  facebook: "f",
-  instagram: "IG",
-  linkedin: "in",
-  pinterest: "P",
-};
-
-const PLATFORM_COLORS: Record<Platform, string> = {
-  google: "bg-[#4285F4]",
-  facebook: "bg-[#1877F2]",
-  instagram: "bg-gradient-to-br from-[#833AB4] via-[#FD1D1D] to-[#F77737]",
-  linkedin: "bg-[#0A66C2]",
-  pinterest: "bg-[#E60023]",
-};
 
 export default function PlatformTabs({
   activePlatform,
@@ -48,11 +33,11 @@ export default function PlatformTabs({
                 : "border border-border bg-bg-white text-text-secondary hover:border-primary/50"
             }`}
           >
-            <span
-              className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white ${PLATFORM_COLORS[platform]}`}
-            >
-              {PLATFORM_ICONS[platform]}
-            </span>
+            <PlatformLogo
+              platform={platform}
+              size={18}
+              className={isActive ? "brightness-0 invert" : ""}
+            />
             {t.platforms[platform]}
           </button>
         );

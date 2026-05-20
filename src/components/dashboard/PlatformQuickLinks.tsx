@@ -2,6 +2,7 @@
 
 import { useI18n } from "@/lib/i18n";
 import type { Platform } from "@/lib/types";
+import PlatformLogo from "@/components/ui/PlatformLogo";
 
 interface PlatformQuickLinksProps {
   platform: Platform;
@@ -26,12 +27,13 @@ export default function PlatformQuickLinks({ platform }: PlatformQuickLinksProps
       rel="noopener noreferrer"
       className="flex items-center gap-2 rounded-lg border border-border bg-bg-white px-4 py-2 text-sm font-medium text-text-secondary transition-colors hover:border-primary/50 hover:text-primary"
     >
-      <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <PlatformLogo platform={platform} size={16} />
+      {link.label}
+      <svg className="h-3.5 w-3.5 text-text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
         <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
         <polyline points="15 3 21 3 21 9" />
         <line x1="10" y1="14" x2="21" y2="3" />
       </svg>
-      {link.label}
     </a>
   );
 }

@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import type { Submission, SubmissionStatus, Platform } from "@/lib/types";
 import StatusBadge from "@/components/dashboard/StatusBadge";
 import FilterBar from "@/components/dashboard/FilterBar";
+import PlatformLogo from "@/components/ui/PlatformLogo";
 
 export default function DashboardPage() {
   const { t } = useI18n();
@@ -116,9 +117,9 @@ export default function DashboardPage() {
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex gap-1">
+                    <div className="flex items-center gap-1.5">
                       {getPlatforms(sub).map((p) => (
-                        <PlatformChip key={p} platform={p} />
+                        <PlatformLogo key={p} platform={p} size={18} />
                       ))}
                     </div>
                   </td>
@@ -146,28 +147,3 @@ export default function DashboardPage() {
   );
 }
 
-const PLATFORM_COLORS: Record<Platform, string> = {
-  google: "bg-[#4285F4]",
-  facebook: "bg-[#1877F2]",
-  instagram: "bg-gradient-to-br from-[#833AB4] via-[#FD1D1D] to-[#F77737]",
-  linkedin: "bg-[#0A66C2]",
-  pinterest: "bg-[#E60023]",
-};
-
-const PLATFORM_ABBR: Record<Platform, string> = {
-  google: "G",
-  facebook: "FB",
-  instagram: "IG",
-  linkedin: "LI",
-  pinterest: "PI",
-};
-
-function PlatformChip({ platform }: { platform: Platform }) {
-  return (
-    <span
-      className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold text-white ${PLATFORM_COLORS[platform]}`}
-    >
-      {PLATFORM_ABBR[platform]}
-    </span>
-  );
-}
