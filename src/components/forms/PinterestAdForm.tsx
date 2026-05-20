@@ -3,6 +3,7 @@
 import { useI18n } from "@/lib/i18n";
 import { PinterestAdContent, CHAR_LIMITS } from "@/lib/types";
 import { fieldTips } from "@/lib/field-tips";
+import { pinterestImageSpecs } from "@/lib/image-specs";
 import TextField from "./shared/TextField";
 import ImageUpload from "./shared/ImageUpload";
 
@@ -61,6 +62,8 @@ export default function PinterestAdForm({
           onImageFile("pinImage", file);
           onChange({ ...data, pinImage: url });
         }}
+        aspectRatio={pinterestImageSpecs.pinImage.aspectRatio}
+        dimensionHint={pinterestImageSpecs.pinImage.label[locale]}
       />
       <TextField
         label={t.pinterest.boardName}

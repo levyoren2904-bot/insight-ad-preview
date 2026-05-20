@@ -9,6 +9,7 @@ import {
   AdFormat,
 } from "@/lib/types";
 import { fieldTips } from "@/lib/field-tips";
+import { linkedinImageSpecs } from "@/lib/image-specs";
 import TextField from "./shared/TextField";
 import ImageUpload from "./shared/ImageUpload";
 import SelectField from "./shared/SelectField";
@@ -29,6 +30,9 @@ export default function LinkedInAdForm({
   const limits = CHAR_LIMITS.linkedin;
   const tips = fieldTips.linkedin;
   const tip = (field: string) => tips[field]?.[locale];
+  const imgSpecs = linkedinImageSpecs[data.adFormat] || linkedinImageSpecs.feed_image;
+  const imgHint = (field: string) => imgSpecs[field]?.label[locale];
+  const imgAspect = (field: string) => imgSpecs[field]?.aspectRatio;
 
   const update = (field: keyof LinkedInAdContent, value: string) => {
     onChange({ ...data, [field]: value });
@@ -68,6 +72,8 @@ export default function LinkedInAdForm({
           onImageFile("companyLogo", file);
           onChange({ ...data, companyLogo: url });
         }}
+        aspectRatio={imgAspect("companyLogo")}
+        dimensionHint={imgHint("companyLogo")}
       />
       <TextField
         label={t.linkedin.introText}
@@ -85,6 +91,8 @@ export default function LinkedInAdForm({
           onImageFile("adImage", file);
           onChange({ ...data, adImage: url });
         }}
+        aspectRatio={imgAspect("adImage")}
+        dimensionHint={imgHint("adImage")}
       />
       <TextField
         label={t.linkedin.headline}

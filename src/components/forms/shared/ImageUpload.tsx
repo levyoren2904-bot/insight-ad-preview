@@ -2,12 +2,15 @@
 
 import { useCallback, useRef, useState } from "react";
 import { useI18n } from "@/lib/i18n";
+import ImageCropModal from "./ImageCropModal";
 
 interface ImageUploadProps {
   label: string;
   value: string | null;
   onChange: (file: File | null, previewUrl: string | null) => void;
   optional?: boolean;
+  aspectRatio?: number;
+  dimensionHint?: string;
 }
 
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
@@ -18,13 +21,17 @@ export default function ImageUpload({
   value,
   onChange,
   optional = true,
+  aspectRatio,
+  dimensionHint,
 }: ImageUploadProps) {
   const { t } = useI18n();
   const inputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
+  const [pendingFileName, setPendingFileName] = useState<string>("");
 
-  const handleFile = useCallback(
+  const openCropper = useCallback(
     (file: File) => {
       setError(null);
       if (!ACCEPTED_TYPES.includes(file.type)) {
@@ -35,28 +42,56 @@ export default function ImageUpload({
         setError(t.submission.maxFileSize);
         return;
       }
+
       const url = URL.createObjectURL(file);
-      onChange(file, url);
+      setPendingFileName(file.name);
+
+      if (aspectRatio) {
+        setCropSrc(url);
+      } else {
+        // No crop needed - use image directly
+        onChange(file, url);
+      }
     },
-    [onChange, t]
+    [onChange, t, aspectRatio]
   );
+
+  const handleCropConfirm = useCallback(
+    (croppedBlob: Blob) => {
+      const croppedFile = new File([croppedBlob], pendingFileName, {
+        type: "image/jpeg",
+      });
+      const url = URL.createObjectURL(croppedBlob);
+      onChange(croppedFile, url);
+      setCropSrc(null);
+      setPendingFileName("");
+    },
+    [onChange, pendingFileName]
+  );
+
+  const handleCropCancel = useCallback(() => {
+    if (cropSrc) URL.revokeObjectURL(cropSrc);
+    setCropSrc(null);
+    setPendingFileName("");
+    if (inputRef.current) inputRef.current.value = "";
+  }, [cropSrc]);
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault();
       setIsDragging(false);
       const file = e.dataTransfer.files[0];
-      if (file) handleFile(file);
+      if (file) openCropper(file);
     },
-    [handleFile]
+    [openCropper]
   );
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
-      if (file) handleFile(file);
+      if (file) openCropper(file);
     },
-    [handleFile]
+    [openCropper]
   );
 
   const handleRemove = useCallback(() => {
@@ -134,6 +169,13 @@ export default function ImageUpload({
         </div>
       )}
 
+      {/* Dimension hint */}
+      {dimensionHint && (
+        <span className="text-xs text-text-muted">
+          {t.common.recommended}: {dimensionHint}
+        </span>
+      )}
+
       <input
         ref={inputRef}
         type="file"
@@ -143,6 +185,16 @@ export default function ImageUpload({
       />
 
       {error && <span className="text-xs text-coral">{error}</span>}
+
+      {/* Crop modal */}
+      {cropSrc && aspectRatio && (
+        <ImageCropModal
+          imageSrc={cropSrc}
+          aspectRatio={aspectRatio}
+          onConfirm={handleCropConfirm}
+          onCancel={handleCropCancel}
+        />
+      )}
     </div>
   );
 }

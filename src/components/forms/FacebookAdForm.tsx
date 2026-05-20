@@ -9,6 +9,7 @@ import {
   AdFormat,
 } from "@/lib/types";
 import { fieldTips } from "@/lib/field-tips";
+import { facebookImageSpecs } from "@/lib/image-specs";
 import TextField from "./shared/TextField";
 import ImageUpload from "./shared/ImageUpload";
 import SelectField from "./shared/SelectField";
@@ -29,6 +30,9 @@ export default function FacebookAdForm({
   const limits = CHAR_LIMITS.facebook;
   const tips = fieldTips.facebook;
   const tip = (field: string) => tips[field]?.[locale];
+  const imgSpecs = facebookImageSpecs[data.adFormat] || facebookImageSpecs.feed_image;
+  const imgHint = (field: string) => imgSpecs[field]?.label[locale];
+  const imgAspect = (field: string) => imgSpecs[field]?.aspectRatio;
 
   const update = (field: keyof FacebookAdContent, value: string) => {
     onChange({ ...data, [field]: value });
@@ -67,6 +71,8 @@ export default function FacebookAdForm({
           onImageFile("profileImage", file);
           onChange({ ...data, profileImage: url });
         }}
+        aspectRatio={imgAspect("profileImage")}
+        dimensionHint={imgHint("profileImage")}
       />
       <TextField
         label={t.facebook.primaryText}
@@ -84,6 +90,8 @@ export default function FacebookAdForm({
           onImageFile("adImage", file);
           onChange({ ...data, adImage: url });
         }}
+        aspectRatio={imgAspect("adImage")}
+        dimensionHint={imgHint("adImage")}
       />
       <TextField
         label={t.facebook.headline}
