@@ -132,7 +132,11 @@
     "copyLink": "Copy Link",
     "submissionHistory": "Submission History",
     "noSubmissions": "No submissions yet",
-    "platformLinks": "Platform Links"
+    "platformLinks": "Platform Links",
+    "statusSaved": "Status saved successfully",
+    "clientSaved": "Client saved successfully",
+    "clientPlatforms": "Advertising Platforms",
+    "clientName": "Client Name"
   },
   "publishing": {
     "title": "Publishing",

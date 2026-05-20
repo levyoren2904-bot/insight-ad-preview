@@ -72,6 +72,7 @@ export interface Client {
   name: string;
   contact_email: string;
   contact_phone: string;
+  platforms: Platform[];
   created_at: string;
 }
 

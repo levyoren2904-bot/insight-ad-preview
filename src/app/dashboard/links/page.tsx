@@ -98,7 +98,7 @@ export default function LinksPage() {
         </h1>
         <button
           onClick={() => setShowForm(true)}
-          className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark"
+          className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary-dark hover:shadow active:scale-[0.98]"
         >
           <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <line x1="12" y1="5" x2="12" y2="19" />
@@ -122,8 +122,16 @@ export default function LinksPage() {
               </label>
               <select
                 value={selectedClient}
-                onChange={(e) => setSelectedClient(e.target.value)}
-                className="w-full rounded-lg border border-border bg-bg-white px-3 py-2 text-sm text-text-primary outline-none focus:border-primary"
+                onChange={(e) => {
+                  const clientId = e.target.value;
+                  setSelectedClient(clientId);
+                  // Auto-fill platforms from client settings
+                  const client = clients.find((c) => c.id === clientId);
+                  if (client?.platforms?.length) {
+                    setSelectedPlatforms(client.platforms);
+                  }
+                }}
+                className="w-full rounded-lg border border-border bg-bg-white px-3 py-2 text-sm text-text-primary outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary"
               >
                 <option value="">{t.dashboard.allClients}</option>
                 {clients.map((c) => (
@@ -176,13 +184,13 @@ export default function LinksPage() {
               <button
                 onClick={handleGenerate}
                 disabled={generating || !selectedClient || selectedPlatforms.length === 0}
-                className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark disabled:opacity-50"
+                className="rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary-dark hover:shadow active:scale-[0.98] disabled:opacity-50 disabled:shadow-none disabled:active:scale-100"
               >
                 {generating ? t.common.loading : t.dashboard.generateLink}
               </button>
               <button
                 onClick={() => setShowForm(false)}
-                className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-text-secondary transition-colors hover:bg-bg-light"
+                className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-text-secondary transition-all hover:bg-bg-light hover:border-border-light active:scale-[0.98]"
               >
                 {t.common.cancel}
               </button>

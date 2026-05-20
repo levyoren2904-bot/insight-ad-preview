@@ -27,6 +27,7 @@ import {
   defaultLinkedInAd,
   defaultPinterestAd,
 } from "@/lib/defaults";
+import Toast from "@/components/ui/Toast";
 
 type FormData = {
   google: GoogleAdContent;
@@ -48,6 +49,7 @@ export default function SubmissionDetailPage() {
   const [status, setStatus] = useState<SubmissionStatus>("pending");
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
 
   const fetchSubmission = useCallback(async () => {
     const { data } = await supabase
@@ -81,6 +83,7 @@ export default function SubmissionDetailPage() {
       .update({ status, admin_notes: notes })
       .eq("id", id);
     setSaving(false);
+    setToast(t.dashboard.statusSaved);
   };
 
   if (loading) {
@@ -178,6 +181,9 @@ export default function SubmissionDetailPage() {
 
   return (
     <div className="mx-auto max-w-7xl">
+      {toast && (
+        <Toast message={toast} type="success" onClose={() => setToast(null)} />
+      )}
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
         <div>
@@ -221,7 +227,7 @@ export default function SubmissionDetailPage() {
             <PlatformQuickLinks platform={activePlatform} />
             <a
               href={`/dashboard/submissions/${id}/publish/${activePlatform}`}
-              className="flex items-center gap-2 rounded-lg bg-teal px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-teal/90"
+              className="flex items-center gap-2 rounded-lg bg-teal px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-teal/90 hover:shadow active:scale-[0.98]"
             >
               <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -273,7 +279,7 @@ export default function SubmissionDetailPage() {
             <button
               onClick={handleSaveStatus}
               disabled={saving}
-              className="mt-3 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark disabled:opacity-50"
+              className="mt-3 rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary-dark hover:shadow active:scale-[0.98] disabled:opacity-50 disabled:shadow-none disabled:active:scale-100"
             >
               {saving ? t.common.loading : t.common.save}
             </button>

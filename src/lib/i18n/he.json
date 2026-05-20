@@ -132,7 +132,11 @@
     "copyLink": "העתקת קישור",
     "submissionHistory": "היסטוריית הגשות",
     "noSubmissions": "אין הגשות עדיין",
-    "platformLinks": "קישורים לפלטפורמות"
+    "platformLinks": "קישורים לפלטפורמות",
+    "statusSaved": "הסטטוס נשמר בהצלחה",
+    "clientSaved": "הלקוח נשמר בהצלחה",
+    "clientPlatforms": "פלטפורמות פרסום",
+    "clientName": "שם הלקוח"
   },
   "publishing": {
     "title": "פרסום",
