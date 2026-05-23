@@ -76,14 +76,71 @@ export default function SubmissionDetailPage() {
     fetchSubmission();
   }, [fetchSubmission]);
 
+  const [editUrl, setEditUrl] = useState<string | null>(null);
+  const [editUrlCopied, setEditUrlCopied] = useState(false);
+
   const handleSaveStatus = async () => {
     setSaving(true);
-    await supabase
-      .from("submissions")
-      .update({ status, admin_notes: notes })
-      .eq("id", id);
+
+    if (status === "needs_changes") {
+      // Generate edit token and send notification
+      const editToken = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}-${Math.random().toString(36).slice(2, 6)}`;
+
+      try {
+        const res = await fetch("/api/notify-changes", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            submissionId: id,
+            notes,
+            editToken,
+          }),
+        });
+        const result = await res.json();
+
+        if (result.success) {
+          setEditUrl(result.editUrl);
+          if (result.emailSent) {
+            setToast(t.dashboard.notificationSent);
+          } else {
+            setToast(t.dashboard.statusSavedNoEmail);
+          }
+        } else {
+          // Fallback: save status directly
+          await supabase
+            .from("submissions")
+            .update({ status, admin_notes: notes, edit_token: editToken })
+            .eq("id", id);
+          setEditUrl(`${window.location.origin}/submit/edit/${editToken}`);
+          setToast(t.dashboard.statusSaved);
+        }
+      } catch {
+        // Fallback: save status directly
+        await supabase
+          .from("submissions")
+          .update({ status, admin_notes: notes })
+          .eq("id", id);
+        setToast(t.dashboard.statusSaved);
+      }
+    } else {
+      // For pending/approved, just save normally
+      await supabase
+        .from("submissions")
+        .update({ status, admin_notes: notes })
+        .eq("id", id);
+      setEditUrl(null);
+      setToast(t.dashboard.statusSaved);
+    }
+
     setSaving(false);
-    setToast(t.dashboard.statusSaved);
+    fetchSubmission();
+  };
+
+  const copyEditUrl = async () => {
+    if (!editUrl) return;
+    await navigator.clipboard.writeText(editUrl);
+    setEditUrlCopied(true);
+    setTimeout(() => setEditUrlCopied(false), 2000);
   };
 
   if (loading) {
@@ -286,8 +343,31 @@ export default function SubmissionDetailPage() {
               disabled={saving}
               className="mt-3 rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary-dark hover:shadow active:scale-[0.98] disabled:opacity-50 disabled:shadow-none disabled:active:scale-100"
             >
-              {saving ? t.common.loading : t.common.save}
+              {saving ? t.common.loading : status === "needs_changes" ? t.dashboard.saveAndNotify : t.common.save}
             </button>
+
+            {/* Edit URL for needs_changes */}
+            {editUrl && (
+              <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3">
+                <p className="mb-2 text-xs font-medium text-amber-800">
+                  {t.dashboard.editLinkReady}
+                </p>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value={editUrl}
+                    className="flex-1 rounded border border-amber-200 bg-white px-2 py-1 text-xs text-text-secondary"
+                  />
+                  <button
+                    onClick={copyEditUrl}
+                    className="shrink-0 rounded-md bg-amber-600 px-3 py-1 text-xs font-medium text-white transition-colors hover:bg-amber-700"
+                  >
+                    {editUrlCopied ? t.common.copied : t.common.copy}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
