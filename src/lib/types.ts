@@ -44,6 +44,7 @@ export interface FacebookAdContent {
   profileImage: string | null;
   primaryText: string;
   adImage: string | null;
+  carouselImages: (string | null)[];
   headline: string;
   description: string;
   ctaButton: CtaOption;
@@ -57,6 +58,7 @@ export interface LinkedInAdContent {
   companyLogo: string | null;
   introText: string;
   adImage: string | null;
+  carouselImages: (string | null)[];
   headline: string;
   description: string;
   ctaButton: CtaOption;

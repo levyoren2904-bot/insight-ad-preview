@@ -64,6 +64,7 @@ export default function PinterestAdForm({
         }}
         aspectRatio={pinterestImageSpecs.pinImage.aspectRatio}
         dimensionHint={pinterestImageSpecs.pinImage.label[locale]}
+        platform="pinterest"
       />
       <TextField
         label={t.pinterest.boardName}

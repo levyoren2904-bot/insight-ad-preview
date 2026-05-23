@@ -151,7 +151,12 @@
     "noLinks": "No links generated yet",
     "submissionsCount": "Submissions",
     "linksCount": "Links",
-    "noPlatforms": "No platforms"
+    "noPlatforms": "No platforms",
+    "carouselCard": "Card",
+    "addCard": "Add Card",
+    "removeCard": "Remove",
+    "safeZone": "Safe Zone",
+    "safeZoneHint": "Avoid placing important elements in the highlighted areas - they may be covered by platform UI"
   },
   "publishing": {
     "title": "Publishing",

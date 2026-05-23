@@ -151,7 +151,12 @@
     "noLinks": "אין קישורים עדיין",
     "submissionsCount": "הגשות",
     "linksCount": "קישורים",
-    "noPlatforms": "ללא פלטפורמות"
+    "noPlatforms": "ללא פלטפורמות",
+    "carouselCard": "כרטיס",
+    "addCard": "הוספת כרטיס",
+    "removeCard": "הסרה",
+    "safeZone": "אזור בטוח",
+    "safeZoneHint": "הימנעו מלשים אלמנטים חשובים באזורים המסומנים - הם עלולים להיות מכוסים על ידי ממשק הפלטפורמה"
   },
   "publishing": {
     "title": "פרסום",
