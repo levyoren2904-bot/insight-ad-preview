@@ -126,15 +126,20 @@ export default function SubmissionDetailPage() {
     switch (activePlatform) {
       case "google": {
         const g = content as GoogleAdContent;
+        const filledHeadlines = (g.headlines || []).filter((h) => h.text);
+        const filledDescs = (g.descriptions || []).filter((d) => d.text);
+        const posLabel = (pos: number | null) => pos ? ` (${t.google.position} ${pos})` : "";
         return (
           <>
             <CopyField label={t.google.companyUrl} value={g.companyUrl} />
-            <CopyField label={t.google.displayPath} value={g.displayPath} />
-            <CopyField label={t.google.headline1} value={g.headline1} />
-            <CopyField label={t.google.headline2} value={g.headline2} />
-            <CopyField label={t.google.headline3} value={g.headline3} />
-            <CopyField label={t.google.description1} value={g.description1} multiline />
-            <CopyField label={t.google.description2} value={g.description2} multiline />
+            <CopyField label={t.google.displayPath1} value={g.displayPath1} />
+            {g.displayPath2 && <CopyField label={t.google.displayPath2} value={g.displayPath2} />}
+            {filledHeadlines.map((h, i) => (
+              <CopyField key={`h${i}`} label={`${t.google.headline} ${i + 1}${posLabel(h.position)}`} value={h.text} />
+            ))}
+            {filledDescs.map((d, i) => (
+              <CopyField key={`d${i}`} label={`${t.google.description} ${i + 1}${posLabel(d.position)}`} value={d.text} multiline />
+            ))}
           </>
         );
       }

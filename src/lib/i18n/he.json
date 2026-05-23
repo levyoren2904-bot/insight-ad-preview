@@ -50,13 +50,21 @@
     "charactersOver": "תווים מעל המגבלה"
   },
   "google": {
-    "companyUrl": "כתובת אתר",
-    "displayPath": "נתיב תצוגה",
-    "headline1": "כותרת 1",
-    "headline2": "כותרת 2",
-    "headline3": "כותרת 3",
-    "description1": "תיאור 1",
-    "description2": "תיאור 2"
+    "companyUrl": "כתובת URL סופית",
+    "displayPath1": "נתיב תצוגה 1",
+    "displayPath2": "נתיב תצוגה 2",
+    "headline": "כותרת",
+    "description": "תיאור",
+    "headlinesSection": "כותרות",
+    "headlinesHint": "ניתן להזין עד 15 כותרות שונות. כל כותרת באורך 30 תווים מקסימום. ניתן לנעוץ כותרת למיקום מסוים, או להשאיר אוטומטי כדי ש-Google תבחר.",
+    "descriptionsSection": "תיאורים",
+    "descriptionsHint": "ניתן להזין עד 4 תיאורים שונים. כל תיאור באורך של 90 תווים מקסימום.",
+    "displayPathSection": "נתיב לתצוגה",
+    "displayPathHint": "מתווסף לקישור. מופיע באותיות קטנות בלבד.",
+    "urlSection": "URL",
+    "position": "מיקום",
+    "unpinned": "אוטומטי",
+    "pinPosition": "נעיצה"
   },
   "facebook": {
     "pageName": "שם העמוד",

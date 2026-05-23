@@ -15,6 +15,7 @@ interface TextFieldProps {
   rows?: number;
   optional?: boolean;
   tip?: string;
+  compact?: boolean;
 }
 
 function TipTooltip({ text }: { text: string }) {
@@ -69,20 +70,21 @@ export default function TextField({
   rows = 3,
   optional = false,
   tip,
+  compact = false,
 }: TextFieldProps) {
   const { t } = useI18n();
   const inputClasses =
     "form-field w-full rounded-lg border border-border bg-bg-white px-3 py-2 text-sm text-text-primary placeholder:text-text-muted transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary";
 
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className={`flex flex-col ${compact ? "gap-0.5" : "gap-1.5"}`}>
       <div className="flex items-center justify-between">
-        <label className="flex items-center gap-1.5 text-sm font-medium text-text-primary">
+        <label className={`flex items-center gap-1.5 font-medium text-text-primary ${compact ? "text-xs" : "text-sm"}`}>
           {label}
           {required && <span className="text-coral ms-0.5">*</span>}
           {tip && <TipTooltip text={tip} />}
         </label>
-        {optional && (
+        {optional && !compact && (
           <span className="text-xs text-text-muted">
             {t.common.optional}
           </span>

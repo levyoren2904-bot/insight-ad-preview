@@ -18,14 +18,25 @@ export type CtaOption =
   | "get_offer"
   | "book_now";
 
+export type HeadlinePosition = 1 | 2 | 3 | null;
+export type DescriptionPosition = 1 | 2 | null;
+
+export interface GoogleHeadline {
+  text: string;
+  position: HeadlinePosition;
+}
+
+export interface GoogleDescription {
+  text: string;
+  position: DescriptionPosition;
+}
+
 export interface GoogleAdContent {
   companyUrl: string;
-  displayPath: string;
-  headline1: string;
-  headline2: string;
-  headline3: string;
-  description1: string;
-  description2: string;
+  displayPath1: string;
+  displayPath2: string;
+  headlines: GoogleHeadline[];
+  descriptions: GoogleDescription[];
 }
 
 export interface FacebookAdContent {
@@ -137,11 +148,9 @@ export const CTA_OPTIONS: CtaOption[] = [
 
 export const CHAR_LIMITS: Record<string, Record<string, number>> = {
   google: {
-    headline1: 30,
-    headline2: 30,
-    headline3: 30,
-    description1: 90,
-    description2: 90,
+    headline: 30,
+    description: 90,
+    displayPath: 15,
   },
   facebook: {
     primaryText: 125,

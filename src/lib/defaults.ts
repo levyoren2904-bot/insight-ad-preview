@@ -7,12 +7,10 @@ import type {
 
 export const defaultGoogleAd: GoogleAdContent = {
   companyUrl: "",
-  displayPath: "",
-  headline1: "",
-  headline2: "",
-  headline3: "",
-  description1: "",
-  description2: "",
+  displayPath1: "",
+  displayPath2: "",
+  headlines: Array.from({ length: 15 }, () => ({ text: "", position: null })),
+  descriptions: Array.from({ length: 4 }, () => ({ text: "", position: null })),
 };
 
 export const defaultFacebookAd: FacebookAdContent = {

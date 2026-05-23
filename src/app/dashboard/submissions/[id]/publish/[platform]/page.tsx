@@ -132,15 +132,33 @@ export default function PublishingChecklistPage() {
     switch (platform) {
       case "google": {
         const g = content as GoogleAdContent;
-        return [
+        const posLabel = (pos: number | null) => pos ? ` (${t.google.position} ${pos})` : "";
+        const fields: FieldDef[] = [
           { key: "companyUrl", label: t.google.companyUrl, value: g.companyUrl },
-          { key: "displayPath", label: t.google.displayPath, value: g.displayPath },
-          { key: "headline1", label: t.google.headline1, value: g.headline1 },
-          { key: "headline2", label: t.google.headline2, value: g.headline2 },
-          { key: "headline3", label: t.google.headline3, value: g.headline3 },
-          { key: "description1", label: t.google.description1, value: g.description1 },
-          { key: "description2", label: t.google.description2, value: g.description2 },
+          { key: "displayPath1", label: t.google.displayPath1, value: g.displayPath1 },
         ];
+        if (g.displayPath2) {
+          fields.push({ key: "displayPath2", label: t.google.displayPath2, value: g.displayPath2 });
+        }
+        (g.headlines || []).forEach((h, i) => {
+          if (h.text) {
+            fields.push({
+              key: `headline_${i}`,
+              label: `${t.google.headline} ${i + 1}${posLabel(h.position)}`,
+              value: h.text,
+            });
+          }
+        });
+        (g.descriptions || []).forEach((d, i) => {
+          if (d.text) {
+            fields.push({
+              key: `description_${i}`,
+              label: `${t.google.description} ${i + 1}${posLabel(d.position)}`,
+              value: d.text,
+            });
+          }
+        });
+        return fields;
       }
       case "facebook":
       case "instagram": {

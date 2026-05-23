@@ -12,12 +12,15 @@ interface CopyAllButtonProps {
 function formatGoogleContent(t: ReturnType<typeof useI18n>["t"], data: GoogleAdContent): string {
   const lines: string[] = [];
   if (data.companyUrl) lines.push(`${t.google.companyUrl}: ${data.companyUrl}`);
-  if (data.displayPath) lines.push(`${t.google.displayPath}: ${data.displayPath}`);
-  if (data.headline1) lines.push(`${t.google.headline1}: ${data.headline1}`);
-  if (data.headline2) lines.push(`${t.google.headline2}: ${data.headline2}`);
-  if (data.headline3) lines.push(`${t.google.headline3}: ${data.headline3}`);
-  if (data.description1) lines.push(`${t.google.description1}: ${data.description1}`);
-  if (data.description2) lines.push(`${t.google.description2}: ${data.description2}`);
+  if (data.displayPath1) lines.push(`${t.google.displayPath1}: ${data.displayPath1}`);
+  if (data.displayPath2) lines.push(`${t.google.displayPath2}: ${data.displayPath2}`);
+  const posLabel = (pos: number | null) => pos ? ` (${t.google.position} ${pos})` : "";
+  (data.headlines || []).forEach((h, i) => {
+    if (h.text) lines.push(`${t.google.headline} ${i + 1}${posLabel(h.position)}: ${h.text}`);
+  });
+  (data.descriptions || []).forEach((d, i) => {
+    if (d.text) lines.push(`${t.google.description} ${i + 1}${posLabel(d.position)}: ${d.text}`);
+  });
   return lines.join("\n");
 }
 

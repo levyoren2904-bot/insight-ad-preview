@@ -50,13 +50,21 @@
     "charactersOver": "characters over limit"
   },
   "google": {
-    "companyUrl": "Company URL",
-    "displayPath": "Display Path",
-    "headline1": "Headline 1",
-    "headline2": "Headline 2",
-    "headline3": "Headline 3",
-    "description1": "Description 1",
-    "description2": "Description 2"
+    "companyUrl": "Final URL",
+    "displayPath1": "Display Path 1",
+    "displayPath2": "Display Path 2",
+    "headline": "Headline",
+    "description": "Description",
+    "headlinesSection": "Headlines",
+    "headlinesHint": "Up to 15 headlines, max 30 characters each. Pin a headline to a specific position, or leave unpinned to let Google optimize.",
+    "descriptionsSection": "Descriptions",
+    "descriptionsHint": "Up to 4 descriptions, max 90 characters each. Pin to a position or leave unpinned.",
+    "displayPathSection": "Display Path",
+    "displayPathHint": "Added to the URL. Shown in lowercase only.",
+    "urlSection": "URL",
+    "position": "Position",
+    "unpinned": "Auto",
+    "pinPosition": "Pin"
   },
   "facebook": {
     "pageName": "Page Name",
