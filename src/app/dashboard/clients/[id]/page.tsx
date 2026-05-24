@@ -12,6 +12,18 @@ import type {
 } from "@/lib/types";
 import PlatformLogo from "@/components/ui/PlatformLogo";
 import Toast from "@/components/ui/Toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Trash2Icon, XIcon } from "lucide-react";
 
 const ALL_PLATFORMS: Platform[] = [
   "google",
@@ -132,6 +144,26 @@ export default function ClientDetailPage() {
     await navigator.clipboard.writeText(url);
     setCopiedId(linkId);
     setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const deleteLink = async (linkId: string) => {
+    await supabase.from("submission_links").delete().eq("id", linkId);
+    setToast({ message: t.dashboard.linkDeleted, type: "success" });
+    fetchData();
+  };
+
+  const deleteClient = async () => {
+    if (submissions.length > 0) {
+      setToast({
+        message: t.dashboard.clientHasSubmissions,
+        type: "error",
+      });
+      return;
+    }
+    // Delete all links first (foreign key), then the client
+    await supabase.from("submission_links").delete().eq("client_id", clientId);
+    await supabase.from("clients").delete().eq("id", clientId);
+    router.push("/dashboard/clients");
   };
 
   const toggleLinkPlatform = (p: Platform) => {
@@ -463,6 +495,33 @@ export default function ClientDetailPage() {
                       </>
                     )}
                   </button>
+
+                  {/* Delete link button */}
+                  <AlertDialog>
+                    <AlertDialogTrigger
+                      aria-label="Delete link"
+                      className="flex size-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-coral/10 hover:text-coral"
+                    >
+                      <XIcon className="size-4" />
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>{t.dashboard.deleteLinkConfirmTitle}</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          {t.dashboard.deleteLinkConfirmDesc}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>{t.common.cancel}</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => deleteLink(link.id)}
+                          className="bg-coral text-white hover:bg-coral/90"
+                        >
+                          {t.common.delete}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               );
             })}
@@ -537,6 +596,50 @@ export default function ClientDetailPage() {
             })}
           </div>
         )}
+      </div>
+
+      {/* Danger zone */}
+      <div className="mt-8 rounded-xl border border-coral/20 bg-coral/5 p-5">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h3 className="text-sm font-semibold text-foreground">
+              {t.dashboard.dangerZone}
+            </h3>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {submissions.length > 0
+                ? t.dashboard.clientHasSubmissions
+                : t.dashboard.deleteClientDesc}
+            </p>
+          </div>
+          <AlertDialog>
+            <AlertDialogTrigger
+              disabled={submissions.length > 0}
+              className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-coral/10 px-2.5 py-1.5 text-xs font-medium text-coral transition-colors hover:bg-coral/20 disabled:pointer-events-none disabled:opacity-50"
+            >
+              <Trash2Icon className="size-3.5" />
+              {t.dashboard.deleteClient}
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  {t.dashboard.deleteClientConfirmTitle}
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  {t.dashboard.deleteClientConfirmDesc.replace("{name}", client.name)}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>{t.common.cancel}</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={deleteClient}
+                  className="bg-coral text-white hover:bg-coral/90"
+                >
+                  {t.common.delete}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </div>
     </div>
   );

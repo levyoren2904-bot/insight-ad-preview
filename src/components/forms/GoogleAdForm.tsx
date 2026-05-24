@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { PlusIcon, PinIcon } from "lucide-react";
+import { PlusIcon, PinIcon, XIcon } from "lucide-react";
 
 interface GoogleAdFormProps {
   data: GoogleAdContent;
@@ -76,6 +76,23 @@ export default function GoogleAdForm({ data, onChange }: GoogleAdFormProps) {
     if (visibleDescriptions < MAX_DESCRIPTIONS) {
       setVisibleDescriptions((v) => v + 1);
     }
+  };
+
+  // Remove a headline at index, shifting subsequent ones up and appending a fresh empty slot at the end
+  const removeHeadline = (index: number) => {
+    if (visibleHeadlines <= MIN_HEADLINES) return;
+    const updated = data.headlines.filter((_, i) => i !== index);
+    updated.push({ text: "", position: null });
+    onChange({ ...data, headlines: updated });
+    setVisibleHeadlines((v) => v - 1);
+  };
+
+  const removeDescription = (index: number) => {
+    if (visibleDescriptions <= MIN_DESCRIPTIONS) return;
+    const updated = data.descriptions.filter((_, i) => i !== index);
+    updated.push({ text: "", position: null });
+    onChange({ ...data, descriptions: updated });
+    setVisibleDescriptions((v) => v - 1);
   };
 
   return (
@@ -137,14 +154,19 @@ export default function GoogleAdForm({ data, onChange }: GoogleAdFormProps) {
               optional={i >= MIN_HEADLINES}
               compact
               headerEnd={
-                <PositionSelect
-                  value={headline.position}
-                  onChange={(v) =>
-                    updateHeadline(i, "position", v as HeadlinePosition)
-                  }
-                  options={[1, 2, 3]}
-                  unpinnedLabel={t.google.unpinned}
-                />
+                <div className="flex items-center gap-1.5">
+                  <PositionSelect
+                    value={headline.position}
+                    onChange={(v) =>
+                      updateHeadline(i, "position", v as HeadlinePosition)
+                    }
+                    options={[1, 2, 3]}
+                    unpinnedLabel={t.google.unpinned}
+                  />
+                  {visibleHeadlines > MIN_HEADLINES && (
+                    <RemoveFieldButton onClick={() => removeHeadline(i)} />
+                  )}
+                </div>
               }
             />
           ))}
@@ -190,14 +212,19 @@ export default function GoogleAdForm({ data, onChange }: GoogleAdFormProps) {
                 optional={i >= MIN_DESCRIPTIONS}
                 compact
                 headerEnd={
-                  <PositionSelect
-                    value={desc.position}
-                    onChange={(v) =>
-                      updateDescription(i, "position", v as DescriptionPosition)
-                    }
-                    options={[1, 2]}
-                    unpinnedLabel={t.google.unpinned}
-                  />
+                  <div className="flex items-center gap-1.5">
+                    <PositionSelect
+                      value={desc.position}
+                      onChange={(v) =>
+                        updateDescription(i, "position", v as DescriptionPosition)
+                      }
+                      options={[1, 2]}
+                      unpinnedLabel={t.google.unpinned}
+                    />
+                    {visibleDescriptions > MIN_DESCRIPTIONS && (
+                      <RemoveFieldButton onClick={() => removeDescription(i)} />
+                    )}
+                  </div>
                 }
               />
             ))}
@@ -253,6 +280,19 @@ function SectionHeader({
         </p>
       )}
     </div>
+  );
+}
+
+function RemoveFieldButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label="Remove field"
+      className="flex size-6 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-coral/10 hover:text-coral focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral/30"
+    >
+      <XIcon className="size-3.5" />
+    </button>
   );
 }
 
