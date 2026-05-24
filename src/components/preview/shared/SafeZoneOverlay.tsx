@@ -2,6 +2,7 @@
 
 import type { Platform, AdFormat } from "@/lib/types";
 import { useSafeZone } from "./SafeZoneContext";
+import { useI18n } from "@/lib/i18n";
 
 interface SafeZoneOverlayProps {
   platform: Platform;
@@ -9,10 +10,23 @@ interface SafeZoneOverlayProps {
   children: React.ReactNode;
 }
 
+type ZoneKey = "ctaButton" | "profile" | "actions" | "caption" | "swipeUp" | "title" | "saveButton";
+
+interface ZoneRect {
+  key: ZoneKey;
+  top?: string;
+  left?: string;
+  right?: string;
+  bottom?: string;
+  width?: string;
+  height?: string;
+}
+
 /**
  * Wraps an image preview and shows where the platform UI elements
- * cover the image when the safe-zone toggle (in PreviewContainer) is on.
- * Reads its visibility from SafeZoneContext.
+ * will cover the image when the toggle (in PreviewContainer) is on.
+ * Uses a diagonal warning-tape pattern to make it obvious these are
+ * areas to AVOID placing important content in.
  */
 export default function SafeZoneOverlay({
   platform,
@@ -20,7 +34,8 @@ export default function SafeZoneOverlay({
   children,
 }: SafeZoneOverlayProps) {
   const { show } = useSafeZone();
-  const zones = getSafeZones(platform, adFormat);
+  const { t } = useI18n();
+  const zones = getZones(platform, adFormat);
 
   return (
     <div className="relative">
@@ -30,7 +45,7 @@ export default function SafeZoneOverlay({
           {zones.map((zone, i) => (
             <div
               key={i}
-              className="absolute border-2 border-dashed border-coral/80 bg-coral/25 backdrop-blur-[1px]"
+              className="absolute border-2 border-coral shadow-[0_0_0_1px_white_inset]"
               style={{
                 top: zone.top,
                 left: zone.left,
@@ -38,10 +53,12 @@ export default function SafeZoneOverlay({
                 bottom: zone.bottom,
                 width: zone.width,
                 height: zone.height,
+                backgroundImage:
+                  "repeating-linear-gradient(45deg, rgba(248,125,78,0.5) 0 10px, rgba(248,125,78,0.2) 10px 20px)",
               }}
             >
-              <span className="absolute start-1.5 top-1 rounded bg-coral px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white shadow-sm">
-                {zone.label}
+              <span className="absolute start-1 top-1 max-w-[calc(100%-8px)] truncate rounded bg-coral px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-white shadow-md">
+                {t.hiddenZones[zone.key]}
               </span>
             </div>
           ))}
@@ -51,54 +68,44 @@ export default function SafeZoneOverlay({
   );
 }
 
-interface ZoneRect {
-  label: string;
-  top?: string;
-  left?: string;
-  right?: string;
-  bottom?: string;
-  width?: string;
-  height?: string;
-}
-
 export function platformHasSafeZones(platform: Platform): boolean {
   return platform !== "google";
 }
 
-function getSafeZones(platform: Platform, adFormat: AdFormat): ZoneRect[] {
+function getZones(platform: Platform, adFormat: AdFormat): ZoneRect[] {
   switch (platform) {
     case "facebook":
       if (adFormat === "story") {
         return [
-          { label: "Profile", top: "0", left: "0", right: "0", height: "14%" },
-          { label: "CTA", bottom: "0", left: "0", right: "0", height: "18%" },
+          { key: "profile", top: "0", left: "0", right: "0", height: "14%" },
+          { key: "ctaButton", bottom: "0", left: "0", right: "0", height: "18%" },
         ];
       }
       return [
-        { label: "CTA", bottom: "0", right: "0", width: "30%", height: "15%" },
+        { key: "ctaButton", bottom: "0", right: "0", width: "30%", height: "15%" },
       ];
 
     case "instagram":
       if (adFormat === "story") {
         return [
-          { label: "Profile", top: "0", left: "0", right: "0", height: "12%" },
-          { label: "Swipe Up", bottom: "0", left: "0", right: "0", height: "16%" },
+          { key: "profile", top: "0", left: "0", right: "0", height: "12%" },
+          { key: "swipeUp", bottom: "0", left: "0", right: "0", height: "16%" },
         ];
       }
       return [
-        { label: "Actions", top: "30%", right: "0", width: "12%", height: "40%" },
-        { label: "Caption", bottom: "0", left: "0", right: "0", height: "12%" },
+        { key: "actions", top: "30%", right: "0", width: "12%", height: "40%" },
+        { key: "caption", bottom: "0", left: "0", right: "0", height: "12%" },
       ];
 
     case "linkedin":
       return [
-        { label: "CTA", bottom: "0", left: "0", right: "0", height: "14%" },
+        { key: "ctaButton", bottom: "0", left: "0", right: "0", height: "14%" },
       ];
 
     case "pinterest":
       return [
-        { label: "Title", bottom: "0", left: "0", right: "0", height: "20%" },
-        { label: "Save", top: "0", right: "0", width: "20%", height: "12%" },
+        { key: "title", bottom: "0", left: "0", right: "0", height: "20%" },
+        { key: "saveButton", top: "0", right: "0", width: "20%", height: "12%" },
       ];
 
     default:

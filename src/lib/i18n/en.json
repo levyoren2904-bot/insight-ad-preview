@@ -175,8 +175,17 @@
     "carouselCard": "Card",
     "addCard": "Add Card",
     "removeCard": "Remove",
-    "safeZone": "Safe Zone",
-    "safeZoneHint": "Avoid placing important elements in the highlighted areas - they may be covered by platform UI"
+    "safeZone": "Hidden Areas",
+    "safeZoneHint": "The highlighted areas will be covered by the platform's UI. Don't place important text or elements that need to be visible there."
+  },
+  "hiddenZones": {
+    "ctaButton": "CTA Button",
+    "profile": "Profile & Name",
+    "actions": "Like/Comment Icons",
+    "caption": "Caption Area",
+    "swipeUp": "Swipe Up",
+    "title": "Pin Title",
+    "saveButton": "Save Button"
   },
   "publishing": {
     "title": "Publishing",
