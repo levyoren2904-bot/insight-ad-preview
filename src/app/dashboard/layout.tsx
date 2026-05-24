@@ -1,42 +1,38 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
+import Image from "next/image";
 import { AuthProvider, useAuth } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
-import Image from "next/image";
 import LanguageToggle from "@/components/layout/LanguageToggle";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Loader2Icon, FileTextIcon, UsersIcon, LogOutIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 function DashboardSidebar() {
   const { t } = useI18n();
   const { signOut } = useAuth();
+  const pathname = usePathname();
 
   const navItems = [
     {
       label: t.dashboard.submissions,
       href: "/dashboard",
-      icon: (
-        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-      ),
+      icon: FileTextIcon,
+      match: (p: string) => p === "/dashboard" || p.startsWith("/dashboard/submissions"),
     },
     {
       label: t.dashboard.clients,
       href: "/dashboard/clients",
-      icon: (
-        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2" />
-          <circle cx="9" cy="7" r="4" />
-          <path d="M23 21v-2a4 4 0 00-3-3.87" />
-          <path d="M16 3.13a4 4 0 010 7.75" />
-        </svg>
-      ),
+      icon: UsersIcon,
+      match: (p: string) => p.startsWith("/dashboard/clients"),
     },
   ];
 
   return (
-    <aside className="flex w-64 shrink-0 flex-col border-e border-border bg-bg-white">
+    <aside className="flex w-64 shrink-0 flex-col border-e border-border bg-background">
       {/* Logo */}
       <div className="flex items-center border-b border-border px-4 py-4">
         <Image
@@ -51,17 +47,26 @@ function DashboardSidebar() {
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4">
         <ul className="flex flex-col gap-1">
-          {navItems.map((item) => (
-            <li key={item.href}>
-              <a
-                href={item.href}
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-text-secondary transition-colors hover:bg-bg-light hover:text-text-primary"
-              >
-                {item.icon}
-                {item.label}
-              </a>
-            </li>
-          ))}
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const active = item.match(pathname);
+            return (
+              <li key={item.href}>
+                <a
+                  href={item.href}
+                  className={cn(
+                    "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                    active
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  )}
+                >
+                  <Icon className="size-4" />
+                  {item.label}
+                </a>
+              </li>
+            );
+          })}
         </ul>
       </nav>
 
@@ -70,17 +75,15 @@ function DashboardSidebar() {
         <div className="mb-3 flex justify-center">
           <LanguageToggle />
         </div>
-        <button
+        <Separator className="mb-3" />
+        <Button
           onClick={signOut}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-text-muted transition-colors hover:bg-bg-light hover:text-coral"
+          variant="ghost"
+          className="w-full justify-start text-muted-foreground hover:text-destructive"
         >
-          <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
-            <polyline points="16 17 21 12 16 7" />
-            <line x1="21" y1="12" x2="9" y2="12" />
-          </svg>
+          <LogOutIcon className="size-4" />
           {t.dashboard.logout}
-        </button>
+        </Button>
       </div>
     </aside>
   );
@@ -99,7 +102,7 @@ function DashboardGuard({ children }: { children: React.ReactNode }) {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        <Loader2Icon className="size-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -109,7 +112,7 @@ function DashboardGuard({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen">
       <DashboardSidebar />
-      <main className="flex-1 overflow-auto bg-bg-light p-6">{children}</main>
+      <main className="flex-1 overflow-auto bg-muted/40 p-6">{children}</main>
     </div>
   );
 }

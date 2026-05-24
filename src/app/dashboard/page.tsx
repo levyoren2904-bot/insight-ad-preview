@@ -7,6 +7,13 @@ import type { Submission, SubmissionStatus, Platform } from "@/lib/types";
 import StatusBadge from "@/components/dashboard/StatusBadge";
 import FilterBar from "@/components/dashboard/FilterBar";
 import PlatformLogo from "@/components/ui/PlatformLogo";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button, buttonVariants } from "@/components/ui/button";
+import {
+  Loader2Icon,
+  FileTextIcon,
+  ChevronRightIcon,
+} from "lucide-react";
 
 export default function DashboardPage() {
   const { t } = useI18n();
@@ -61,58 +68,63 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        <Loader2Icon className="size-8 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
     <div className="mx-auto max-w-6xl">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-text-primary">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">
           {t.dashboard.submissions}
         </h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {filtered.length} {filtered.length === 1 ? "submission" : "submissions"}
+        </p>
       </div>
 
-      <FilterBar
-        statusFilter={statusFilter}
-        onStatusChange={setStatusFilter}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-      />
+      <div className="mb-4">
+        <FilterBar
+          statusFilter={statusFilter}
+          onStatusChange={setStatusFilter}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+        />
+      </div>
 
       {filtered.length === 0 ? (
-        <div className="mt-8 rounded-xl border border-border bg-bg-white p-12 text-center">
-          <div className="mb-3 text-4xl text-text-muted">
-            <svg className="mx-auto h-12 w-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-          </div>
-          <p className="text-text-muted">{t.dashboard.noSubmissions}</p>
-        </div>
+        <Card>
+          <CardContent className="flex flex-col items-center gap-3 py-16 text-center">
+            <div className="rounded-full bg-muted p-3">
+              <FileTextIcon className="size-6 text-muted-foreground" />
+            </div>
+            <p className="text-muted-foreground">{t.dashboard.noSubmissions}</p>
+          </CardContent>
+        </Card>
       ) : (
-        <div className="mt-4 overflow-hidden rounded-xl border border-border bg-bg-white shadow-sm">
+        <Card className="overflow-hidden p-0">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-border bg-bg-subtle text-start text-xs font-semibold uppercase tracking-wider text-text-muted">
+              <tr className="border-b border-border bg-muted/50 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 <th className="px-4 py-3 text-start">Client</th>
                 <th className="px-4 py-3 text-start">Platforms</th>
                 <th className="px-4 py-3 text-start">Status</th>
                 <th className="px-4 py-3 text-start">Date</th>
-                <th className="px-4 py-3 text-start"></th>
+                <th className="px-4 py-3"></th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((sub) => (
                 <tr
                   key={sub.id}
-                  className="border-b border-border-light last:border-0 transition-colors hover:bg-bg-subtle"
+                  className="border-b border-border-light last:border-0 transition-colors hover:bg-muted/30"
                 >
                   <td className="px-4 py-3">
-                    <div className="text-sm font-medium text-text-primary">
+                    <div className="text-sm font-medium text-foreground">
                       {sub.client?.name || "Unknown"}
                     </div>
-                    <div className="text-xs text-text-muted">
+                    <div className="text-xs text-muted-foreground">
                       {sub.client?.contact_email}
                     </div>
                   </td>
@@ -126,24 +138,24 @@ export default function DashboardPage() {
                   <td className="px-4 py-3">
                     <StatusBadge status={sub.status} />
                   </td>
-                  <td className="px-4 py-3 text-sm text-text-secondary">
+                  <td className="px-4 py-3 text-sm text-muted-foreground">
                     {formatDate(sub.created_at)}
                   </td>
                   <td className="px-4 py-3 text-end">
                     <a
                       href={`/dashboard/submissions/${sub.id}`}
-                      className="rounded-lg px-3 py-1.5 text-sm font-medium text-primary transition-colors hover:bg-primary/5"
+                      className={buttonVariants({ variant: "ghost", size: "sm" })}
                     >
                       {t.common.edit}
+                      <ChevronRightIcon className="size-3.5 rtl:rotate-180" />
                     </a>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </div>
+        </Card>
       )}
     </div>
   );
 }
-

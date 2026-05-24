@@ -27,7 +27,13 @@ import {
   defaultLinkedInAd,
   defaultPinterestAd,
 } from "@/lib/defaults";
-import Toast from "@/components/ui/Toast";
+import { toast } from "sonner";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { ChevronLeftIcon, FileTextIcon, Loader2Icon, CopyIcon, CheckIcon, MailIcon } from "lucide-react";
 
 type FormData = {
   google: GoogleAdContent;
@@ -49,7 +55,6 @@ export default function SubmissionDetailPage() {
   const [status, setStatus] = useState<SubmissionStatus>("pending");
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
 
   const fetchSubmission = useCallback(async () => {
     const { data } = await supabase
@@ -101,35 +106,32 @@ export default function SubmissionDetailPage() {
         if (result.success) {
           setEditUrl(result.editUrl);
           if (result.emailSent) {
-            setToast(t.dashboard.notificationSent);
+            toast.success(t.dashboard.notificationSent);
           } else {
-            setToast(t.dashboard.statusSavedNoEmail);
+            toast.info(t.dashboard.statusSavedNoEmail);
           }
         } else {
-          // Fallback: save status directly
           await supabase
             .from("submissions")
             .update({ status, admin_notes: notes, edit_token: editToken })
             .eq("id", id);
           setEditUrl(`${window.location.origin}/submit/edit/${editToken}`);
-          setToast(t.dashboard.statusSaved);
+          toast.success(t.dashboard.statusSaved);
         }
       } catch {
-        // Fallback: save status directly
         await supabase
           .from("submissions")
           .update({ status, admin_notes: notes })
           .eq("id", id);
-        setToast(t.dashboard.statusSaved);
+        toast.error(t.dashboard.statusSaved);
       }
     } else {
-      // For pending/approved, just save normally
       await supabase
         .from("submissions")
         .update({ status, admin_notes: notes })
         .eq("id", id);
       setEditUrl(null);
-      setToast(t.dashboard.statusSaved);
+      toast.success(t.dashboard.statusSaved);
     }
 
     setSaving(false);
@@ -243,25 +245,20 @@ export default function SubmissionDetailPage() {
 
   return (
     <div className="mx-auto max-w-7xl">
-      {toast && (
-        <Toast message={toast} type="success" onClose={() => setToast(null)} />
-      )}
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
         <div>
           <a
             href="/dashboard"
-            className="mb-2 inline-flex items-center gap-1 text-sm text-text-muted hover:text-primary"
+            className={buttonVariants({ variant: "ghost", size: "sm", className: "mb-2 -ms-2 h-7 px-2 text-muted-foreground" })}
           >
-            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
+            <ChevronLeftIcon className="size-4 rtl:rotate-180" />
             {t.common.back}
           </a>
           <h1 className="text-2xl font-bold text-text-primary">
             {t.dashboard.submissionDetail}
           </h1>
-          <p className="mt-1 text-sm text-text-muted">
+          <p className="mt-1 text-sm text-muted-foreground">
             {submission.client?.name} - {new Date(submission.created_at).toLocaleDateString("en-GB")}
           </p>
         </div>
@@ -289,11 +286,9 @@ export default function SubmissionDetailPage() {
             <PlatformQuickLinks platform={activePlatform} />
             <a
               href={`/dashboard/submissions/${id}/publish/${activePlatform}`}
-              className="flex items-center gap-2 rounded-lg bg-teal px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-teal/90 hover:shadow active:scale-[0.98]"
+              className={buttonVariants({ size: "lg", className: "bg-teal text-white hover:bg-teal/90" })}
             >
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
+              <FileTextIcon className="size-4" />
               {t.dashboard.startPublishing}
             </a>
           </div>
@@ -304,71 +299,76 @@ export default function SubmissionDetailPage() {
           </div>
 
           {/* Status controls */}
-          <div className="mt-6 rounded-xl border border-border bg-bg-white p-4">
-            <h3 className="mb-3 text-sm font-semibold text-text-muted">
-              {t.dashboard.changeStatus}
-            </h3>
-            <div className="flex gap-2">
-              {(["pending", "approved", "needs_changes"] as SubmissionStatus[]).map(
-                (s) => (
-                  <button
-                    key={s}
-                    onClick={() => setStatus(s)}
-                    className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-                      status === s
-                        ? "bg-primary text-white"
-                        : "border border-border text-text-secondary hover:border-primary/50"
-                    }`}
-                  >
-                    {t.status[s === "needs_changes" ? "needsChanges" : s]}
-                  </button>
-                )
-              )}
-            </div>
-
-            <div className="mt-3">
-              <label className="mb-1 block text-xs font-medium text-text-muted">
-                {t.dashboard.adminNotes}
-              </label>
-              <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                rows={3}
-                className="w-full rounded-lg border border-border bg-bg-subtle px-3 py-2 text-sm text-text-primary outline-none focus:border-primary"
-              />
-            </div>
-
-            <button
-              onClick={handleSaveStatus}
-              disabled={saving}
-              className="mt-3 rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary-dark hover:shadow active:scale-[0.98] disabled:opacity-50 disabled:shadow-none disabled:active:scale-100"
-            >
-              {saving ? t.common.loading : status === "needs_changes" ? t.dashboard.saveAndNotify : t.common.save}
-            </button>
-
-            {/* Edit URL for needs_changes */}
-            {editUrl && (
-              <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3">
-                <p className="mb-2 text-xs font-medium text-amber-800">
-                  {t.dashboard.editLinkReady}
-                </p>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    readOnly
-                    value={editUrl}
-                    className="flex-1 rounded border border-amber-200 bg-white px-2 py-1 text-xs text-text-secondary"
-                  />
-                  <button
-                    onClick={copyEditUrl}
-                    className="shrink-0 rounded-md bg-amber-600 px-3 py-1 text-xs font-medium text-white transition-colors hover:bg-amber-700"
-                  >
-                    {editUrlCopied ? t.common.copied : t.common.copy}
-                  </button>
-                </div>
+          <Card className="mt-6">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-semibold text-muted-foreground">
+                {t.dashboard.changeStatus}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-4">
+              <div className="flex flex-wrap gap-2">
+                {(["pending", "approved", "needs_changes"] as SubmissionStatus[]).map(
+                  (s) => (
+                    <Button
+                      key={s}
+                      onClick={() => setStatus(s)}
+                      variant={status === s ? "default" : "outline"}
+                      size="sm"
+                      className={status === s && s === "needs_changes" ? "bg-coral text-white hover:bg-coral/90" : status === s && s === "approved" ? "bg-teal text-white hover:bg-teal/90" : ""}
+                    >
+                      {t.status[s === "needs_changes" ? "needsChanges" : s]}
+                    </Button>
+                  )
+                )}
               </div>
-            )}
-          </div>
+
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="admin-notes" className="text-xs">
+                  {t.dashboard.adminNotes}
+                </Label>
+                <Textarea
+                  id="admin-notes"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  rows={3}
+                  placeholder={status === "needs_changes" ? "What needs to change?" : ""}
+                />
+              </div>
+
+              <Button onClick={handleSaveStatus} disabled={saving} className="self-start">
+                {saving ? (
+                  <><Loader2Icon className="size-4 animate-spin" /> {t.common.loading}</>
+                ) : status === "needs_changes" ? (
+                  <><MailIcon className="size-4" /> {t.dashboard.saveAndNotify}</>
+                ) : (
+                  t.common.save
+                )}
+              </Button>
+
+              {/* Edit URL for needs_changes */}
+              {editUrl && (
+                <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
+                  <p className="mb-2 text-xs font-medium text-amber-800">
+                    {t.dashboard.editLinkReady}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      readOnly
+                      value={editUrl}
+                      className="flex-1 h-8 text-xs border-amber-200"
+                    />
+                    <Button
+                      onClick={copyEditUrl}
+                      size="sm"
+                      className="bg-amber-600 text-white hover:bg-amber-700"
+                    >
+                      {editUrlCopied ? <><CheckIcon className="size-3" /> {t.common.copied}</> : <><CopyIcon className="size-3" /> {t.common.copy}</>}
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
 
         {/* Preview panel */}

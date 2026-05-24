@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
-import { Inter, Heebo } from "next/font/google";
+import { Inter, Heebo, Geist } from "next/font/google";
 import "./globals.css";
 import { I18nProvider } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
+import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const inter = Inter({
   variable: "--font-inter",
@@ -28,10 +33,15 @@ export default function RootLayout({
     <html
       lang="he"
       dir="rtl"
-      className={`${inter.variable} ${heebo.variable} h-full antialiased`}
+      className={cn("h-full", "antialiased", inter.variable, heebo.variable, "font-sans", geist.variable)}
     >
       <body className="flex min-h-full flex-col">
-        <I18nProvider>{children}</I18nProvider>
+        <I18nProvider>
+          <TooltipProvider delay={200}>
+            {children}
+            <Toaster richColors closeButton position="top-center" />
+          </TooltipProvider>
+        </I18nProvider>
       </body>
     </html>
   );
