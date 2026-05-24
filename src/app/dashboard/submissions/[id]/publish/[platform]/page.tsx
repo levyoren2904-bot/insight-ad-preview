@@ -114,14 +114,19 @@ export default function PublishingChecklistPage() {
       .single();
 
     const current = (sub?.published_platforms as Platform[]) || [];
-    if (!current.includes(platform)) {
-      await supabase
-        .from("submissions")
-        .update({
-          published_platforms: [...current, platform],
-        })
-        .eq("id", submissionId);
-    }
+    const published_platforms = current.includes(platform)
+      ? current
+      : [...current, platform];
+
+    // Publishing implies approval - the ad has been pushed live to the platform
+    await supabase
+      .from("submissions")
+      .update({
+        published_platforms,
+        status: "approved",
+        edit_token: null,
+      })
+      .eq("id", submissionId);
 
     router.push(`/dashboard/submissions/${submissionId}`);
   };
