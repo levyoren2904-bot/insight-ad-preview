@@ -3,6 +3,7 @@
 import { useI18n } from "@/lib/i18n";
 import type { FacebookAdContent, CtaOption } from "@/lib/types";
 import PlaceholderImage from "../shared/PlaceholderImage";
+import CarouselPreview from "../shared/CarouselPreview";
 
 interface InstagramFeedPreviewProps {
   data: FacebookAdContent;
@@ -24,6 +25,58 @@ export default function InstagramFeedPreview({
   const { t } = useI18n();
   const pageName = data.pageName || t.facebook.pageName;
   const primaryText = data.primaryText || "Your caption will appear here...";
+  const isCarousel = data.adFormat === "carousel";
+  const isStory = data.adFormat === "story";
+
+  // Instagram Story: 9:16 fullscreen with gradient ring
+  if (isStory) {
+    return (
+      <div
+        className="relative mx-auto overflow-hidden rounded-2xl bg-black shadow-md"
+        style={{ aspectRatio: "9 / 16", maxWidth: "320px" }}
+      >
+        {data.adImage ? (
+          <img src={data.adImage} alt="" className="absolute inset-0 h-full w-full object-cover" />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#833AB4]/30 via-[#FD1D1D]/20 to-[#F77737]/20">
+            <PlaceholderImage aspectRatio="aspect-[9/16]" className="w-full h-full" />
+          </div>
+        )}
+
+        {/* Top - profile with IG gradient ring */}
+        <div className="absolute inset-x-0 top-0 bg-gradient-to-b from-black/50 to-transparent p-3">
+          <div className="flex items-center gap-2">
+            <div className="rounded-full bg-gradient-to-br from-[#833AB4] via-[#FD1D1D] to-[#F77737] p-0.5">
+              {data.profileImage ? (
+                <img src={data.profileImage} alt="" className="h-7 w-7 rounded-full object-cover ring-2 ring-black" />
+              ) : (
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-black text-[10px] font-bold text-white ring-2 ring-black">
+                  {pageName.charAt(0).toUpperCase()}
+                </div>
+              )}
+            </div>
+            <div className="text-xs font-semibold text-white drop-shadow">
+              {pageName.toLowerCase().replace(/\s/g, "")}
+            </div>
+            <div className="ms-auto text-[10px] text-white/80">Sponsored</div>
+          </div>
+          <div className="mt-2 h-0.5 w-full overflow-hidden rounded-full bg-white/30">
+            <div className="h-full w-1/3 rounded-full bg-white" />
+          </div>
+        </div>
+
+        {/* Bottom - Swipe up CTA */}
+        <div className="absolute inset-x-0 bottom-0 flex flex-col items-center bg-gradient-to-t from-black/70 to-transparent p-4">
+          <svg className="mb-1 size-5 animate-bounce text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <path d="M18 15l-6-6-6 6" />
+          </svg>
+          <button className="rounded-full bg-white px-6 py-2 text-sm font-semibold text-black">
+            {CTA_LABELS[data.ctaButton]}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="overflow-hidden rounded-lg bg-white shadow-sm">
@@ -55,8 +108,14 @@ export default function InstagramFeedPreview({
         </svg>
       </div>
 
-      {/* Ad image - square for Instagram */}
-      {data.adImage ? (
+      {/* Image area - carousel or single (always 1:1 for Instagram feed) */}
+      {isCarousel ? (
+        <CarouselPreview
+          images={data.carouselImages || [null, null, null]}
+          aspectRatio="1 / 1"
+          ctaStyle="instagram"
+        />
+      ) : data.adImage ? (
         <img
           src={data.adImage}
           alt=""

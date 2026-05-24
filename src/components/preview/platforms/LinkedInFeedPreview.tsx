@@ -3,6 +3,7 @@
 import { useI18n } from "@/lib/i18n";
 import type { LinkedInAdContent, CtaOption } from "@/lib/types";
 import PlaceholderImage from "../shared/PlaceholderImage";
+import CarouselPreview from "../shared/CarouselPreview";
 
 interface LinkedInFeedPreviewProps {
   data: LinkedInAdContent;
@@ -24,6 +25,7 @@ export default function LinkedInFeedPreview({ data }: LinkedInFeedPreviewProps) 
   const introText = data.introText || "Your introductory text will appear here...";
   const headline = data.headline || "Headline";
   const description = data.description || "";
+  const isCarousel = data.adFormat === "carousel";
 
   return (
     <div className="overflow-hidden rounded-lg bg-white shadow-sm">
@@ -58,8 +60,16 @@ export default function LinkedInFeedPreview({ data }: LinkedInFeedPreviewProps) 
         {introText}
       </div>
 
-      {/* Ad image */}
-      {data.adImage ? (
+      {/* Image area - carousel or single */}
+      {isCarousel ? (
+        <CarouselPreview
+          images={data.carouselImages || [null, null, null]}
+          aspectRatio="1 / 1"
+          headline={headline}
+          ctaLabel={CTA_LABELS[data.ctaButton]}
+          ctaStyle="linkedin"
+        />
+      ) : data.adImage ? (
         <img
           src={data.adImage}
           alt=""
@@ -70,22 +80,24 @@ export default function LinkedInFeedPreview({ data }: LinkedInFeedPreviewProps) 
         <PlaceholderImage />
       )}
 
-      {/* Link preview */}
-      <div className="flex items-center justify-between border-t border-[#e0e0e0] bg-white px-4 py-3">
-        <div className="min-w-0 flex-1">
-          <div className="truncate text-sm font-semibold text-[#000000e6]">
-            {headline}
-          </div>
-          {description && (
-            <div className="truncate text-xs text-[#00000099]">
-              {description}
+      {/* Link preview - only for single image format */}
+      {!isCarousel && (
+        <div className="flex items-center justify-between border-t border-[#e0e0e0] bg-white px-4 py-3">
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-sm font-semibold text-[#000000e6]">
+              {headline}
             </div>
-          )}
+            {description && (
+              <div className="truncate text-xs text-[#00000099]">
+                {description}
+              </div>
+            )}
+          </div>
+          <button className="ms-3 shrink-0 rounded-full border border-[#0a66c2] px-4 py-1.5 text-sm font-semibold text-[#0a66c2]">
+            {CTA_LABELS[data.ctaButton]}
+          </button>
         </div>
-        <button className="ms-3 shrink-0 rounded-full border border-[#0a66c2] px-4 py-1.5 text-sm font-semibold text-[#0a66c2]">
-          {CTA_LABELS[data.ctaButton]}
-        </button>
-      </div>
+      )}
 
       {/* Engagement bar */}
       <div className="flex items-center gap-1 border-t border-[#e0e0e0] px-4 py-1">
