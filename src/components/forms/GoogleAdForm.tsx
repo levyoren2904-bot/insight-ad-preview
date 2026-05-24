@@ -127,20 +127,16 @@ export default function GoogleAdForm({ data, onChange }: GoogleAdFormProps) {
         />
         <div className="mt-4 flex flex-col gap-3">
           {data.headlines.slice(0, visibleHeadlines).map((headline, i) => (
-            <FieldRow
+            <TextField
               key={i}
-              field={
-                <TextField
-                  label={`${t.google.headline} ${i + 1}`}
-                  value={headline.text}
-                  onChange={(v) => updateHeadline(i, "text", v)}
-                  maxChars={limits.headline}
-                  required={i < MIN_HEADLINES}
-                  optional={i >= MIN_HEADLINES}
-                  compact
-                />
-              }
-              position={
+              label={`${t.google.headline} ${i + 1}`}
+              value={headline.text}
+              onChange={(v) => updateHeadline(i, "text", v)}
+              maxChars={limits.headline}
+              required={i < MIN_HEADLINES}
+              optional={i >= MIN_HEADLINES}
+              compact
+              headerEnd={
                 <PositionSelect
                   value={headline.position}
                   onChange={(v) =>
@@ -182,22 +178,18 @@ export default function GoogleAdForm({ data, onChange }: GoogleAdFormProps) {
           {data.descriptions
             .slice(0, visibleDescriptions)
             .map((desc, i) => (
-              <FieldRow
+              <TextField
                 key={i}
-                field={
-                  <TextField
-                    label={`${t.google.description} ${i + 1}`}
-                    value={desc.text}
-                    onChange={(v) => updateDescription(i, "text", v)}
-                    maxChars={limits.description}
-                    multiline
-                    rows={2}
-                    required={i < MIN_DESCRIPTIONS}
-                    optional={i >= MIN_DESCRIPTIONS}
-                    compact
-                  />
-                }
-                position={
+                label={`${t.google.description} ${i + 1}`}
+                value={desc.text}
+                onChange={(v) => updateDescription(i, "text", v)}
+                maxChars={limits.description}
+                multiline
+                rows={2}
+                required={i < MIN_DESCRIPTIONS}
+                optional={i >= MIN_DESCRIPTIONS}
+                compact
+                headerEnd={
                   <PositionSelect
                     value={desc.position}
                     onChange={(v) =>
@@ -231,15 +223,6 @@ export default function GoogleAdForm({ data, onChange }: GoogleAdFormProps) {
   );
 }
 
-// Layout helper - keeps field + position select properly aligned via CSS grid
-function FieldRow({ field, position }: { field: React.ReactNode; position: React.ReactNode }) {
-  return (
-    <div className="grid grid-cols-[1fr_auto] items-end gap-3">
-      <div className="min-w-0">{field}</div>
-      <div className="pb-[2px]">{position}</div>
-    </div>
-  );
-}
 
 // --- Sub-components ---
 
@@ -284,23 +267,30 @@ function PositionSelect({
   options: number[];
   unpinnedLabel: string;
 }) {
+  const pinned = value !== null;
   return (
     <Select
       value={value === null ? "auto" : String(value)}
       onValueChange={(v) => onChange(v === "auto" ? null : Number(v))}
     >
       <SelectTrigger
-        className="h-9 w-[90px] gap-1.5 text-xs data-[placeholder]:text-muted-foreground"
+        className={`h-6 gap-1 rounded-full border-0 px-2 text-[11px] font-medium shadow-none focus:ring-1 focus:ring-primary/30 ${
+          pinned
+            ? "bg-primary/10 text-primary hover:bg-primary/15"
+            : "bg-muted text-muted-foreground hover:bg-muted/70"
+        }`}
         aria-label="Position"
       >
-        <PinIcon className={`size-3 ${value !== null ? "text-primary" : "text-muted-foreground"}`} />
-        <SelectValue />
+        <PinIcon className="size-2.5" />
+        <SelectValue>
+          {pinned ? `#${value}` : unpinnedLabel}
+        </SelectValue>
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent align="end" className="min-w-[120px]">
         <SelectItem value="auto" className="text-xs">{unpinnedLabel}</SelectItem>
         {options.map((o) => (
           <SelectItem key={o} value={String(o)} className="text-xs">
-            #{o}
+            Position #{o}
           </SelectItem>
         ))}
       </SelectContent>

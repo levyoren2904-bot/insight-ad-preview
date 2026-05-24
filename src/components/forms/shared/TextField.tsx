@@ -16,6 +16,8 @@ interface TextFieldProps {
   optional?: boolean;
   tip?: string;
   compact?: boolean;
+  /** Slot rendered at the end of the label row (replaces the "optional" badge if present) */
+  headerEnd?: React.ReactNode;
 }
 
 function TipTooltip({ text }: { text: string }) {
@@ -71,6 +73,7 @@ export default function TextField({
   optional = false,
   tip,
   compact = false,
+  headerEnd,
 }: TextFieldProps) {
   const { t } = useI18n();
   const inputClasses =
@@ -84,11 +87,11 @@ export default function TextField({
           {required && <span className="text-coral ms-0.5">*</span>}
           {tip && <TipTooltip text={tip} />}
         </label>
-        {optional && !compact && (
+        {headerEnd ?? (optional && !compact && (
           <span className="text-xs text-text-muted">
             {t.common.optional}
           </span>
-        )}
+        ))}
       </div>
       {multiline ? (
         <textarea
