@@ -45,8 +45,13 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-bg-light px-4">
-      <div className="w-full max-w-sm">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-bg-light via-white to-primary/5 px-4">
+      {/* Floating brand orbs */}
+      <div className="pointer-events-none absolute -top-32 -start-32 size-96 rounded-full bg-primary/20 blur-3xl animate-float-slow" aria-hidden="true" />
+      <div className="pointer-events-none absolute -bottom-32 -end-32 size-96 rounded-full bg-teal/15 blur-3xl animate-float-slow-reverse" aria-hidden="true" />
+      <div className="pointer-events-none absolute top-1/3 end-1/4 size-64 rounded-full bg-coral/10 blur-3xl animate-float-slow" aria-hidden="true" style={{ animationDelay: '-6s' }} />
+
+      <div className="relative w-full max-w-sm animate-page-in">
         {/* Logo */}
         <div className="mb-8 flex justify-center">
           <Image
@@ -55,10 +60,11 @@ export default function LoginPage() {
             width={160}
             height={52}
             priority
+            className="mix-blend-multiply"
           />
         </div>
 
-        <Card className="shadow-md">
+        <Card className="border-white/60 bg-white/70 shadow-xl backdrop-blur-xl">
           <CardHeader className="text-center">
             <CardTitle className="text-xl">{t.dashboard.title}</CardTitle>
             <CardDescription>Sign in to manage submissions</CardDescription>

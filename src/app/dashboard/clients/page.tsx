@@ -75,7 +75,7 @@ export default function ClientsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-4xl animate-page-in">
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">
@@ -105,11 +105,12 @@ export default function ClientsPage() {
         </Card>
       ) : (
         <div className="flex flex-col gap-3">
-          {clients.map((client) => (
+          {clients.map((client, i) => (
             <a
               key={client.id}
               href={`/dashboard/clients/${client.id}`}
-              className="group"
+              className="group animate-stagger"
+              style={{ animationDelay: `${Math.min(i * 50, 400)}ms` }}
             >
               <Card className="transition-all hover:border-primary/30 hover:shadow-md">
                 <CardContent className="flex items-center gap-4 p-4">

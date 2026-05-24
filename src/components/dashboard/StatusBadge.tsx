@@ -39,7 +39,7 @@ export default function StatusBadge({ status }: StatusBadgeProps) {
 
   return (
     <Badge variant="outline" className={`gap-1 ${className}`}>
-      <Icon className="size-3" />
+      <Icon className={`size-3 ${status === "pending" ? "animate-pulse-soft" : ""}`} />
       {labels[status]}
     </Badge>
   );

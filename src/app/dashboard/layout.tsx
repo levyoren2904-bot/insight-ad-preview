@@ -41,6 +41,7 @@ function DashboardSidebar() {
           width={120}
           height={40}
           priority
+          className="mix-blend-multiply"
         />
       </div>
 

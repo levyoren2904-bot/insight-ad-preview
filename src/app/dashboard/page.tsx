@@ -74,7 +74,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl">
+    <div className="mx-auto max-w-6xl animate-page-in">
       <div className="mb-6">
         <h1 className="text-2xl font-bold tracking-tight text-foreground">
           {t.dashboard.submissions}
@@ -115,10 +115,11 @@ export default function DashboardPage() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((sub) => (
+              {filtered.map((sub, i) => (
                 <tr
                   key={sub.id}
-                  className="border-b border-border-light last:border-0 transition-colors hover:bg-muted/30"
+                  className="animate-stagger border-b border-border-light last:border-0 transition-colors hover:bg-muted/30"
+                  style={{ animationDelay: `${Math.min(i * 35, 400)}ms` }}
                 >
                   <td className="px-4 py-3">
                     <div className="text-sm font-medium text-foreground">

@@ -244,7 +244,7 @@ export default function SubmissionDetailPage() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl">
+    <div className="mx-auto max-w-7xl animate-page-in">
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
         <div>

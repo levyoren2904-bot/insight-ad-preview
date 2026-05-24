@@ -11,6 +11,15 @@ import {
   CHAR_LIMITS,
 } from "@/lib/types";
 import TextField from "./shared/TextField";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { PlusIcon, PinIcon } from "lucide-react";
 
 interface GoogleAdFormProps {
   data: GoogleAdContent;
@@ -70,11 +79,11 @@ export default function GoogleAdForm({ data, onChange }: GoogleAdFormProps) {
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       {/* URL Section */}
-      <div>
+      <section>
         <SectionHeader title={t.google.urlSection} />
-        <div className="mt-3">
+        <div className="mt-4">
           <TextField
             label={t.google.companyUrl}
             value={data.companyUrl}
@@ -83,15 +92,15 @@ export default function GoogleAdForm({ data, onChange }: GoogleAdFormProps) {
             required
           />
         </div>
-      </div>
+      </section>
 
       {/* Display Path Section */}
-      <div>
+      <section>
         <SectionHeader
           title={t.google.displayPathSection}
           hint={t.google.displayPathHint}
         />
-        <div className="mt-3 grid grid-cols-2 gap-3">
+        <div className="mt-4 grid grid-cols-2 gap-4">
           <TextField
             label={t.google.displayPath1}
             value={data.displayPath1}
@@ -107,19 +116,20 @@ export default function GoogleAdForm({ data, onChange }: GoogleAdFormProps) {
             optional
           />
         </div>
-      </div>
+      </section>
 
       {/* Headlines Section */}
-      <div>
+      <section>
         <SectionHeader
           title={t.google.headlinesSection}
           hint={t.google.headlinesHint}
           count={`${filledHeadlineCount}/${MAX_HEADLINES}`}
         />
-        <div className="mt-3 flex flex-col gap-2">
+        <div className="mt-4 flex flex-col gap-3">
           {data.headlines.slice(0, visibleHeadlines).map((headline, i) => (
-            <div key={i} className="flex items-start gap-2">
-              <div className="flex-1">
+            <FieldRow
+              key={i}
+              field={
                 <TextField
                   label={`${t.google.headline} ${i + 1}`}
                   value={headline.text}
@@ -129,58 +139,52 @@ export default function GoogleAdForm({ data, onChange }: GoogleAdFormProps) {
                   optional={i >= MIN_HEADLINES}
                   compact
                 />
-              </div>
-              <PositionSelect
-                value={headline.position}
-                onChange={(v) =>
-                  updateHeadline(i, "position", v as HeadlinePosition)
-                }
-                options={[1, 2, 3]}
-                label={t.google.position}
-                unpinnedLabel={t.google.unpinned}
-              />
-            </div>
+              }
+              position={
+                <PositionSelect
+                  value={headline.position}
+                  onChange={(v) =>
+                    updateHeadline(i, "position", v as HeadlinePosition)
+                  }
+                  options={[1, 2, 3]}
+                  unpinnedLabel={t.google.unpinned}
+                />
+              }
+            />
           ))}
         </div>
 
-        {/* Add more button */}
         {visibleHeadlines < MAX_HEADLINES && (
-          <button
+          <Button
             type="button"
             onClick={addHeadline}
-            className="mt-2 flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/5 active:scale-[0.98]"
+            variant="ghost"
+            size="sm"
+            className="mt-3 text-primary hover:bg-primary/5 hover:text-primary"
           >
-            <svg
-              className="h-3.5 w-3.5"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-            >
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
+            <PlusIcon className="size-3.5" />
             {t.google.headline} {visibleHeadlines + 1}
-            <span className="text-text-muted">
+            <span className="text-muted-foreground">
               ({visibleHeadlines}/{MAX_HEADLINES})
             </span>
-          </button>
+          </Button>
         )}
-      </div>
+      </section>
 
       {/* Descriptions Section */}
-      <div>
+      <section>
         <SectionHeader
           title={t.google.descriptionsSection}
           hint={t.google.descriptionsHint}
           count={`${filledDescCount}/${MAX_DESCRIPTIONS}`}
         />
-        <div className="mt-3 flex flex-col gap-2">
+        <div className="mt-4 flex flex-col gap-3">
           {data.descriptions
             .slice(0, visibleDescriptions)
             .map((desc, i) => (
-              <div key={i} className="flex items-start gap-2">
-                <div className="flex-1">
+              <FieldRow
+                key={i}
+                field={
                   <TextField
                     label={`${t.google.description} ${i + 1}`}
                     value={desc.text}
@@ -192,43 +196,47 @@ export default function GoogleAdForm({ data, onChange }: GoogleAdFormProps) {
                     optional={i >= MIN_DESCRIPTIONS}
                     compact
                   />
-                </div>
-                <PositionSelect
-                  value={desc.position}
-                  onChange={(v) =>
-                    updateDescription(i, "position", v as DescriptionPosition)
-                  }
-                  options={[1, 2]}
-                  label={t.google.position}
-                  unpinnedLabel={t.google.unpinned}
-                />
-              </div>
+                }
+                position={
+                  <PositionSelect
+                    value={desc.position}
+                    onChange={(v) =>
+                      updateDescription(i, "position", v as DescriptionPosition)
+                    }
+                    options={[1, 2]}
+                    unpinnedLabel={t.google.unpinned}
+                  />
+                }
+              />
             ))}
         </div>
 
         {visibleDescriptions < MAX_DESCRIPTIONS && (
-          <button
+          <Button
             type="button"
             onClick={addDescription}
-            className="mt-2 flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/5 active:scale-[0.98]"
+            variant="ghost"
+            size="sm"
+            className="mt-3 text-primary hover:bg-primary/5 hover:text-primary"
           >
-            <svg
-              className="h-3.5 w-3.5"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-            >
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
+            <PlusIcon className="size-3.5" />
             {t.google.description} {visibleDescriptions + 1}
-            <span className="text-text-muted">
+            <span className="text-muted-foreground">
               ({visibleDescriptions}/{MAX_DESCRIPTIONS})
             </span>
-          </button>
+          </Button>
         )}
-      </div>
+      </section>
+    </div>
+  );
+}
+
+// Layout helper - keeps field + position select properly aligned via CSS grid
+function FieldRow({ field, position }: { field: React.ReactNode; position: React.ReactNode }) {
+  return (
+    <div className="grid grid-cols-[1fr_auto] items-end gap-3">
+      <div className="min-w-0">{field}</div>
+      <div className="pb-[2px]">{position}</div>
     </div>
   );
 }
@@ -246,16 +254,18 @@ function SectionHeader({
 }) {
   return (
     <div>
-      <div className="flex items-center gap-2">
-        <div className="rounded-md bg-primary/10 px-2.5 py-1">
-          <span className="text-sm font-bold text-primary">{title}</span>
-        </div>
+      <div className="flex items-center gap-3">
+        <h3 className="text-sm font-bold uppercase tracking-wider text-foreground">
+          {title}
+        </h3>
         {count && (
-          <span className="text-xs font-medium text-text-muted">{count}</span>
+          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold tabular-nums text-primary">
+            {count}
+          </span>
         )}
       </div>
       {hint && (
-        <p className="mt-1.5 text-[11px] leading-snug text-text-muted">
+        <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
           {hint}
         </p>
       )}
@@ -267,33 +277,33 @@ function PositionSelect({
   value,
   onChange,
   options,
-  label,
   unpinnedLabel,
 }: {
   value: number | null;
   onChange: (v: number | null) => void;
   options: number[];
-  label: string;
   unpinnedLabel: string;
 }) {
   return (
-    <div className="mt-6 shrink-0">
-      <select
-        value={value ?? ""}
-        onChange={(e) => {
-          const v = e.target.value;
-          onChange(v === "" ? null : Number(v));
-        }}
-        className="w-[72px] rounded-lg border border-border bg-bg-white px-2 py-[7px] text-xs text-text-secondary outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary"
-        title={label}
+    <Select
+      value={value === null ? "auto" : String(value)}
+      onValueChange={(v) => onChange(v === "auto" ? null : Number(v))}
+    >
+      <SelectTrigger
+        className="h-9 w-[90px] gap-1.5 text-xs data-[placeholder]:text-muted-foreground"
+        aria-label="Position"
       >
-        <option value="">{unpinnedLabel}</option>
+        <PinIcon className={`size-3 ${value !== null ? "text-primary" : "text-muted-foreground"}`} />
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="auto" className="text-xs">{unpinnedLabel}</SelectItem>
         {options.map((o) => (
-          <option key={o} value={o}>
-            {label} {o}
-          </option>
+          <SelectItem key={o} value={String(o)} className="text-xs">
+            #{o}
+          </SelectItem>
         ))}
-      </select>
-    </div>
+      </SelectContent>
+    </Select>
   );
 }
