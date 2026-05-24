@@ -4,6 +4,7 @@ import { useI18n } from "@/lib/i18n";
 import type { FacebookAdContent, CtaOption } from "@/lib/types";
 import PlaceholderImage from "../shared/PlaceholderImage";
 import CarouselPreview from "../shared/CarouselPreview";
+import SafeZoneOverlay from "../shared/SafeZoneOverlay";
 
 interface FacebookFeedPreviewProps {
   data: FacebookAdContent;
@@ -31,21 +32,22 @@ export default function FacebookFeedPreview({ data }: FacebookFeedPreviewProps) 
   // Story format: 9:16 fullscreen-style layout
   if (isStory) {
     return (
-      <div
-        className="relative mx-auto overflow-hidden rounded-2xl bg-black shadow-md"
-        style={{ aspectRatio: "9 / 16", maxWidth: "320px" }}
-      >
-        {data.adImage ? (
-          <img
-            src={data.adImage}
-            alt=""
-            className="absolute inset-0 h-full w-full object-cover"
-          />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#1877F2]/20 to-[#1877F2]/5">
-            <PlaceholderImage aspectRatio="aspect-[9/16]" className="w-full h-full" />
-          </div>
-        )}
+      <SafeZoneOverlay platform="facebook" adFormat="story">
+        <div
+          className="relative mx-auto overflow-hidden rounded-2xl bg-black shadow-md"
+          style={{ aspectRatio: "9 / 16", maxWidth: "320px" }}
+        >
+          {data.adImage ? (
+            <img
+              src={data.adImage}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#1877F2]/20 to-[#1877F2]/5">
+              <PlaceholderImage aspectRatio="aspect-[9/16]" className="w-full h-full" />
+            </div>
+          )}
 
         {/* Top gradient + profile */}
         <div className="absolute inset-x-0 top-0 bg-gradient-to-b from-black/50 to-transparent p-3">
@@ -75,7 +77,8 @@ export default function FacebookFeedPreview({ data }: FacebookFeedPreviewProps) 
             {CTA_LABELS[data.ctaButton]} ↑
           </button>
         </div>
-      </div>
+        </div>
+      </SafeZoneOverlay>
     );
   }
 
@@ -120,15 +123,19 @@ export default function FacebookFeedPreview({ data }: FacebookFeedPreviewProps) 
           ctaLabel={CTA_LABELS[data.ctaButton]}
           ctaStyle="facebook"
         />
-      ) : data.adImage ? (
-        <img
-          src={data.adImage}
-          alt=""
-          className="w-full object-cover"
-          style={{ aspectRatio: "1.91 / 1" }}
-        />
       ) : (
-        <PlaceholderImage />
+        <SafeZoneOverlay platform="facebook" adFormat="feed_image">
+          {data.adImage ? (
+            <img
+              src={data.adImage}
+              alt=""
+              className="w-full object-cover"
+              style={{ aspectRatio: "1.91 / 1" }}
+            />
+          ) : (
+            <PlaceholderImage />
+          )}
+        </SafeZoneOverlay>
       )}
 
       {/* Link preview bar - only for single image format */}

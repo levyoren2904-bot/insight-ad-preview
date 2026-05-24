@@ -3,8 +3,6 @@
 import { useCallback, useRef, useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import ImageCropModal from "./ImageCropModal";
-import SafeZoneOverlay from "./SafeZoneOverlay";
-import type { Platform, AdFormat } from "@/lib/types";
 
 interface ImageUploadProps {
   label: string;
@@ -13,8 +11,10 @@ interface ImageUploadProps {
   optional?: boolean;
   aspectRatio?: number;
   dimensionHint?: string;
-  platform?: Platform;
-  adFormat?: AdFormat;
+  /** @deprecated kept for compatibility; safe zones moved to preview */
+  platform?: unknown;
+  /** @deprecated kept for compatibility; safe zones moved to preview */
+  adFormat?: unknown;
 }
 
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
@@ -27,8 +27,6 @@ export default function ImageUpload({
   optional = true,
   aspectRatio,
   dimensionHint,
-  platform,
-  adFormat,
 }: ImageUploadProps) {
   const { t } = useI18n();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -118,30 +116,28 @@ export default function ImageUpload({
       </div>
 
       {value ? (
-        <SafeZoneOverlay platform={platform || "google"} adFormat={adFormat}>
-          <div className="relative overflow-hidden rounded-lg border border-border">
-            <img
-              src={value}
-              alt="Preview"
-              className="h-32 w-full object-cover"
-            />
-            <button
-              onClick={handleRemove}
-              className="absolute end-2 top-2 z-10 rounded-full bg-bg-white/90 p-1 text-text-secondary shadow-sm transition-colors hover:text-coral"
+        <div className="relative overflow-hidden rounded-lg border border-border">
+          <img
+            src={value}
+            alt="Preview"
+            className="h-32 w-full object-cover"
+          />
+          <button
+            onClick={handleRemove}
+            className="absolute end-2 top-2 z-10 rounded-full bg-bg-white/90 p-1 text-text-secondary shadow-sm transition-colors hover:text-coral"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
             >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M4 4l8 8M12 4l-8 8" />
-              </svg>
-            </button>
-          </div>
-        </SafeZoneOverlay>
+              <path d="M4 4l8 8M12 4l-8 8" />
+            </svg>
+          </button>
+        </div>
       ) : (
         <div
           onDragOver={(e) => {

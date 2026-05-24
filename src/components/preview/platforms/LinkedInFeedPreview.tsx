@@ -4,6 +4,7 @@ import { useI18n } from "@/lib/i18n";
 import type { LinkedInAdContent, CtaOption } from "@/lib/types";
 import PlaceholderImage from "../shared/PlaceholderImage";
 import CarouselPreview from "../shared/CarouselPreview";
+import SafeZoneOverlay from "../shared/SafeZoneOverlay";
 
 interface LinkedInFeedPreviewProps {
   data: LinkedInAdContent;
@@ -69,15 +70,19 @@ export default function LinkedInFeedPreview({ data }: LinkedInFeedPreviewProps) 
           ctaLabel={CTA_LABELS[data.ctaButton]}
           ctaStyle="linkedin"
         />
-      ) : data.adImage ? (
-        <img
-          src={data.adImage}
-          alt=""
-          className="w-full object-cover"
-          style={{ aspectRatio: "1.91 / 1" }}
-        />
       ) : (
-        <PlaceholderImage />
+        <SafeZoneOverlay platform="linkedin" adFormat="feed_image">
+          {data.adImage ? (
+            <img
+              src={data.adImage}
+              alt=""
+              className="w-full object-cover"
+              style={{ aspectRatio: "1.91 / 1" }}
+            />
+          ) : (
+            <PlaceholderImage />
+          )}
+        </SafeZoneOverlay>
       )}
 
       {/* Link preview - only for single image format */}

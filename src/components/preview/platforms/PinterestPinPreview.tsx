@@ -3,6 +3,7 @@
 import { useI18n } from "@/lib/i18n";
 import type { PinterestAdContent } from "@/lib/types";
 import PlaceholderImage from "../shared/PlaceholderImage";
+import SafeZoneOverlay from "../shared/SafeZoneOverlay";
 
 interface PinterestPinPreviewProps {
   data: PinterestAdContent;
@@ -20,21 +21,23 @@ export default function PinterestPinPreview({ data }: PinterestPinPreviewProps) 
   return (
     <div className="mx-auto max-w-[236px] overflow-hidden rounded-2xl bg-white shadow-sm">
       {/* Pin image */}
-      <div className="relative">
-        {data.pinImage ? (
-          <img
-            src={data.pinImage}
-            alt=""
-            className="w-full object-cover"
-            style={{ aspectRatio: "2 / 3" }}
-          />
-        ) : (
-          <PlaceholderImage aspectRatio="aspect-[2/3]" />
-        )}
-        <div className="absolute top-2 start-2 rounded-full bg-[#e60023] px-2 py-0.5 text-[10px] font-semibold text-white">
-          Promoted
+      <SafeZoneOverlay platform="pinterest" adFormat="feed_image">
+        <div className="relative">
+          {data.pinImage ? (
+            <img
+              src={data.pinImage}
+              alt=""
+              className="w-full object-cover"
+              style={{ aspectRatio: "2 / 3" }}
+            />
+          ) : (
+            <PlaceholderImage aspectRatio="aspect-[2/3]" />
+          )}
+          <div className="absolute top-2 start-2 rounded-full bg-[#e60023] px-2 py-0.5 text-[10px] font-semibold text-white">
+            Promoted
+          </div>
         </div>
-      </div>
+      </SafeZoneOverlay>
 
       {/* Pin info */}
       <div className="p-3">

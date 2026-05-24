@@ -4,6 +4,7 @@ import { useI18n } from "@/lib/i18n";
 import type { FacebookAdContent, CtaOption } from "@/lib/types";
 import PlaceholderImage from "../shared/PlaceholderImage";
 import CarouselPreview from "../shared/CarouselPreview";
+import SafeZoneOverlay from "../shared/SafeZoneOverlay";
 
 interface InstagramFeedPreviewProps {
   data: FacebookAdContent;
@@ -31,6 +32,7 @@ export default function InstagramFeedPreview({
   // Instagram Story: 9:16 fullscreen with gradient ring
   if (isStory) {
     return (
+      <SafeZoneOverlay platform="instagram" adFormat="story">
       <div
         className="relative mx-auto overflow-hidden rounded-2xl bg-black shadow-md"
         style={{ aspectRatio: "9 / 16", maxWidth: "320px" }}
@@ -75,6 +77,7 @@ export default function InstagramFeedPreview({
           </button>
         </div>
       </div>
+      </SafeZoneOverlay>
     );
   }
 
@@ -115,15 +118,19 @@ export default function InstagramFeedPreview({
           aspectRatio="1 / 1"
           ctaStyle="instagram"
         />
-      ) : data.adImage ? (
-        <img
-          src={data.adImage}
-          alt=""
-          className="w-full object-cover"
-          style={{ aspectRatio: "1 / 1" }}
-        />
       ) : (
-        <PlaceholderImage aspectRatio="aspect-square" />
+        <SafeZoneOverlay platform="instagram" adFormat="feed_image">
+          {data.adImage ? (
+            <img
+              src={data.adImage}
+              alt=""
+              className="w-full object-cover"
+              style={{ aspectRatio: "1 / 1" }}
+            />
+          ) : (
+            <PlaceholderImage aspectRatio="aspect-square" />
+          )}
+        </SafeZoneOverlay>
       )}
 
       {/* CTA button */}

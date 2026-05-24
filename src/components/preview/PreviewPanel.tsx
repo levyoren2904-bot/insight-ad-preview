@@ -14,6 +14,7 @@ import FacebookFeedPreview from "./platforms/FacebookFeedPreview";
 import InstagramFeedPreview from "./platforms/InstagramFeedPreview";
 import LinkedInFeedPreview from "./platforms/LinkedInFeedPreview";
 import PinterestPinPreview from "./platforms/PinterestPinPreview";
+import { SafeZoneProvider } from "./shared/SafeZoneContext";
 
 interface PreviewPanelProps {
   platform: Platform;
@@ -43,7 +44,13 @@ const PreviewPanel = forwardRef<HTMLDivElement, PreviewPanelProps>(
       }
     };
 
-    return <PreviewContainer ref={ref}>{renderPreview()}</PreviewContainer>;
+    return (
+      <SafeZoneProvider>
+        <PreviewContainer ref={ref} platform={platform}>
+          {renderPreview()}
+        </PreviewContainer>
+      </SafeZoneProvider>
+    );
   }
 );
 
